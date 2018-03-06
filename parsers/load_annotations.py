@@ -2,17 +2,49 @@ import csv
 import json
 import argparse
 
-def ComplexHandler(Obj):
-    if hasattr(Obj, 'jsonable'):
-        return Obj.jsonable()
-    else:
-        raise TypeError('Object of type %s with value of %s is not JSON serializable' % (type(Obj), repr(Obj)))
 
 class AerialData:
+    class BoundingBox:
+        def __init__(self, pt1, pt2, pt3, pt4):
+            self.pt1 = pt1
+            self.pt2 = pt3
+            self.pt3 = pt3
+            self.pt4 = pt4
+
+    class LargeVehicleFeatures:
+        def __init__(self, subclass,
+                     open_cargo_area,
+                     vents,
+                     air_conditioner,
+                     wrecked,
+                     enclosed_box,
+                     enclosed_cab,
+                     ladder,
+                     flatbed,
+                     soft_shell_box,
+                     harnessed_to_cart,
+                     color
+                     ):
+            self.subclass = subclass
+            self.open_cargo_area = open_cargo_area
+            self.vents = vents
+            self.air_conditioner = air_conditioner
+            self.wrecked = wrecked
+            self.enclosed_box = enclosed_box
+            self.enclosed_cab = enclosed_cab
+            self.ladder = ladder
+            self.flatbed = flatbed
+            self.soft_shell_box = soft_shell_box
+            self.harnessed_to_cart = harnessed_to_cart
+            self.color = color
+
     class InnerData:
         def __init__(self, image_id):
             self.image_id = image_id
-            self.category = ''
+            self.category = None
+            self.bounding_box = {}
+            self.label = None
+            self.sublabel = None
 
     def __init__(self):
         self.data = {}
@@ -33,12 +65,16 @@ class AerialData:
                 if image_id not in self.data:
                     self.data[image_id] = self.InnerData(image_id)
                 self.data[image_id].category = cat
+            reader = csv.reader(train_tags_file, delimiter=',', quotechar='"')
+            next(reader)
+            for row in reader:
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Loads aerial annotations')
     parser.add_argument('--train_tags', dest='train_tags', type=str,
-                        default='../Detecting And Classifying Objects In Aerial Imagery/Train/CSV/Train_tags.csv', help='train tags file path')
+                        default='../Detecting And Classifying Objects In Aerial Imagery/Train/CSV/Train_tags.csv',
+                        help='train tags file path')
     parser.add_argument('--train_details', dest='train_details', type=str,
                         default='../Detecting And Classifying Objects In Aerial Imagery/Train/CSV/Train_imagery_details.csv',
                         help='train tags file path')
@@ -46,4 +82,3 @@ if __name__ == '__main__':
     print(args.train_details, args.train_tags)
     data = AerialData()
     data.load(args.train_details, args.train_tags)
-    print(json.dumps(data.__dict__, default=ComplexHandler))
