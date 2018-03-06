@@ -1,33 +1,20 @@
-from __future__ import print_function
 from __future__ import absolute_import
-# --------------------------------------------------------
-# Fast R-CNN
-# Copyright (c) 2015 Microsoft
-# Licensed under The MIT License [see LICENSE for details]
-# Written by Ross Girshick
-# --------------------------------------------------------
-
-import xml.dom.minidom as minidom
+from __future__ import print_function
 
 import os
-# import PIL
-import numpy as np
-import scipy.sparse
-import subprocess
-import math
-import glob
-import uuid
-import scipy.io as sio
-import xml.etree.ElementTree as ET
 import pickle
-from .imdb import imdb
-from .imdb import ROOT_DIR
-from . import ds_utils
-from .voc_eval import voc_eval
+import subprocess
+import uuid
+import xml.etree.ElementTree as ET
 
-# TODO: make fast_rcnn irrelevant
-# >>>> obsolete, because it depends on sth outside of this project
+import numpy as np
+import scipy.io as sio
+import scipy.sparse
 from model.utils.config import cfg
+
+from . import ds_utils
+from .imdb import imdb
+from .voc_eval import voc_eval
 
 try:
     xrange          # Python 2

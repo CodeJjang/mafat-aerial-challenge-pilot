@@ -1,5 +1,6 @@
-from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import print_function
+
 __author__ = 'tylin'
 __version__ = '1.0.1'
 # Interface for accessing the Microsoft COCO dataset.
@@ -47,7 +48,6 @@ __version__ = '1.0.1'
 # Licensed under the Simplified BSD License [see bsd.txt]
 
 import json
-import datetime
 import time
 import matplotlib.pyplot as plt
 from matplotlib.collections import PatchCollection

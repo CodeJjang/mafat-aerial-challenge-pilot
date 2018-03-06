@@ -1,0 +1,8 @@
+max dims: (4010, 2668)
+min dims: (900, 600)
+# of images: 9369
+# of images in [0, 1000]: 9251
+# of images in [1000, 2000]: 6
+# of images in [2000, 3000]: 62
+# of images in [3000, 4000]: 0
+# of images in [4000, 5000]: 50
