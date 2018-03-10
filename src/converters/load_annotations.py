@@ -75,7 +75,9 @@ class AerialData:
         def __init__(self, fname, image_id):
             self.fname = fname
             self.image_id = image_id
-            self.category = None
+            self.category = None,
+            self.width = None
+            self.height = None
             self.bounding_box = None
             self.label = None
             self.sublabel = None
