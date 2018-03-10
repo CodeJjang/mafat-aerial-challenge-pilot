@@ -4,3 +4,5 @@ coco/coco annotations/
 .idea/
 data/
 **/*/__pycache__
+**/*/*.pyc
+**/*/~*
