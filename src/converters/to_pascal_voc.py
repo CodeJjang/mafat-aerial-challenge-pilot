@@ -2,7 +2,8 @@ import argparse
 import random
 import os
 import xml.etree.cElementTree as ET
-from converters.load_annotations import AerialData
+import _init_paths
+from load_annotations import AerialData
 from utils.logger import Logger
 
 class PascalVoc:
