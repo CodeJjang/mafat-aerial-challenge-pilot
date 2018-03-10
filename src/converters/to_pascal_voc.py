@@ -120,7 +120,7 @@ if __name__ == '__main__':
                         default=90,
                         help='percentage of train from whole dataset', choices=range(1, 100))
     parser.add_argument('--data', dest='data_path', type=str,
-                        default='../../data',
+                        default='../faster-rcnn.pytorch/data',
                         help='data dir path')
     parser.add_argument('--cached-aerial-data', dest='load_cached_aerial_data', type=bool,
                         default=True,

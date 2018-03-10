@@ -193,7 +193,7 @@ if __name__ == '__main__':
                         default='../../Detecting And Classifying Objects In Aerial Imagery/Train/Imagery data',
                         help='Images file path')
     parser.add_argument('--data', dest='data_path', type=str,
-                        default='../../data',
+                        default='../faster-rcnn.pytorch/data',
                         help='data dir path')
     args = parser.parse_args()
     Logger.log(args.train_details, args.train_tags)
