@@ -3,3 +3,4 @@ Detecting And Classifying Objects In Aerial Imagery/
 coco/coco annotations/
 .idea/
 data/
+**/*/__pycache__
