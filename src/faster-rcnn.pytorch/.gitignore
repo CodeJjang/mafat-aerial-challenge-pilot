@@ -1,0 +1,6 @@
+data/*
+**/*.pyc
+**/~*
+images/
+saved_models/
+output/
