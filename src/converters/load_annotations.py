@@ -111,8 +111,8 @@ class AerialData:
 
     def load(self, train_details_file, train_tags_file, images_dir):
         Logger.log('Loading aerial data files...')
-        with open(train_details_file, 'rt') as train_details:
-            reader = csv.reader(train_details, delimiter=',', quotechar='"')
+        with open(train_details_file, 'rtU') as train_details:
+            reader = csv.reader(train_details, delimiter=',', quotechar='"', dialect=csv.excel_tab)
             # skip first row
             next(reader)
             for row in reader:
@@ -129,8 +129,8 @@ class AerialData:
                 # Open image to read size
                 size = Image.open(os.path.join(images_dir, self.data[image_id].fname)).size
                 self.data[image_id].width, self.data[image_id].height = size
-        with open(train_tags_file, 'rt') as train_tags:
-            reader = csv.reader(train_tags, delimiter=',', quotechar='"')
+        with open(train_tags_file, 'rtU') as train_tags:
+            reader = csv.reader(train_tags, delimiter=',', quotechar='"', dialect=csv.excel_tab)
             next(reader)
             for row in reader:
                 image_id = row[0]
