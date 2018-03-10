@@ -196,6 +196,5 @@ if __name__ == '__main__':
                         default='../faster-rcnn.pytorch/data',
                         help='data dir path')
     args = parser.parse_args()
-    Logger.log(args.train_details, args.train_tags)
     data = AerialData(args.data_path)
     data.load(args.train_details, args.train_tags, args.images_dir)

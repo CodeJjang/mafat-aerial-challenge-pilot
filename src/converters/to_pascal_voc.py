@@ -127,7 +127,6 @@ if __name__ == '__main__':
                         help='whether to load cached aerial data or generate from scratch')
 
     args = parser.parse_args()
-    Logger.log(args.train_details, args.train_tags)
     if args.load_cached_aerial_data and AerialData.is_cached(args.data_path):
         data = AerialData.from_cache(args.data_path)
     else:
