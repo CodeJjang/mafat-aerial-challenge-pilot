@@ -71,6 +71,12 @@ class AerialData:
             self.spare_wheel = spare_wheel
             self.color = color
 
+    class Object:
+        def __init__(self, bbox, label, sublabel=None):
+            self.bounding_box = bbox
+            self.label = label
+            self.sublabel = sublabel
+
     class InnerData:
         def __init__(self, fname, image_id):
             self.fname = fname
@@ -78,9 +84,7 @@ class AerialData:
             self.category = None,
             self.width = None
             self.height = None
-            self.bounding_box = None
-            self.label = None
-            self.sublabel = None
+            self.objects = []
 
     def _create_dirpath_if_not_exist(self, dirpath):
         if not os.path.exists(dirpath):
@@ -137,18 +141,17 @@ class AerialData:
             for row in reader:
                 image_id = row[0]
                 if image_id not in self.data:
-                    raise RuntimeError('Image id %s in train tags was not present in train details' % image_id)
+                    continue
                 label = row[9]
                 inner_data = self.data[image_id]
-                inner_data.label = label
                 subclass, sunroof, taxi, luggage_carrier, \
                 open_cargo_area, enclosed_cab, spare_wheel, \
                 wrecked, flatbed, ladder, \
                 enclosed_box, soft_shell_box, harnessed_to_cart, \
                 vents, air_conditioner, color = row[10:len(row)]
                 if label == 'large vehicle':
-                    inner_data.bounding_box = self.create_box(row)
-                    inner_data.sublabel = self.LargeVehicleFeatures(subclass,
+                    bounding_box = self.create_box(row)
+                    sublabel = self.LargeVehicleFeatures(subclass,
                                                                     open_cargo_area,
                                                                     vents,
                                                                     air_conditioner,
@@ -160,9 +163,11 @@ class AerialData:
                                                                     soft_shell_box,
                                                                     harnessed_to_cart,
                                                                     color)
+                    obj = self.Object(bounding_box, label, sublabel)
+                    inner_data.objects.append(obj)
                 elif label == 'small vehicle':
-                    inner_data.bounding_box = self.create_box(row)
-                    inner_data.sublabel = self.SmallVehicleFeatures(subclass,
+                    bounding_box = self.create_box(row)
+                    sublabel = self.SmallVehicleFeatures(subclass,
                                                                     sunroof,
                                                                     taxi,
                                                                     luggage_carrier,
@@ -171,13 +176,19 @@ class AerialData:
                                                                     wrecked,
                                                                     spare_wheel,
                                                                     color)
+                    obj = self.Object(bounding_box, label, sublabel)
+                    inner_data.objects.append(obj)
                 elif label == 'solar panel':
-                    inner_data.bounding_box = self.create_box(row)
+                    bounding_box = self.create_box(row)
+                    obj = self.Object(bounding_box, label)
+                    inner_data.objects.append(obj)
                 elif label == 'utility pole':
-                    inner_data.bounding_box = self.BoundingBox((row[1], row[2]),
+                    bounding_box = self.BoundingBox((row[1], row[2]),
                                                                (row[1], row[2]),
                                                                (row[1], row[2]),
                                                                (row[1], row[2]))
+                    obj = self.Object(bounding_box, label)
+                    inner_data.objects.append(obj)
                 else:
                     raise RuntimeError('Unrecognized class %s' % label)
         Logger.log('Finished loading aerial data files')

@@ -65,16 +65,17 @@ class PascalVoc:
 
             ET.SubElement(root, "segmented").text = 0
 
-            object = ET.SubElement(root, "object")
-            ET.SubElement(object, "name").text = image.label
-            ET.SubElement(object, "pose").text = 'Unspecified'
-            ET.SubElement(object, "truncated").text = str(0)
-            ET.SubElement(object, "difficult").text = str(0)
-            bb = ET.SubElement(object, "bndbox")
-            ET.SubElement(bb, 'xmin').text, \
-            ET.SubElement(bb, 'ymin').text, \
-            ET.SubElement(bb, 'xmax').text, \
-            ET.SubElement(bb, 'ymax').text = self._obb_to_pascal_hbb(image.bounding_box.get_points())
+            for obj in image.objects:
+                object = ET.SubElement(root, "object")
+                ET.SubElement(object, "name").text = obj.label
+                ET.SubElement(object, "pose").text = 'Unspecified'
+                ET.SubElement(object, "truncated").text = str(0)
+                ET.SubElement(object, "difficult").text = str(0)
+                bb = ET.SubElement(object, "bndbox")
+                ET.SubElement(bb, 'xmin').text, \
+                ET.SubElement(bb, 'ymin').text, \
+                ET.SubElement(bb, 'xmax').text, \
+                ET.SubElement(bb, 'ymax').text = self._obb_to_pascal_hbb(obj.bounding_box.get_points())
 
             tree = ET.ElementTree(root)
             tree.write(fpath)
@@ -109,6 +110,9 @@ class PascalVoc:
         ymax = max([y for _, y in obb])
         return str(xmin), str(ymin), str(xmax), str(ymax)
 
+    '''
+    Remove Untagged and No objects images, along with high res images
+    '''
     def _filter_images(self, data):
         filtered_data = {img_id: data[img_id] for img_id in data if
                          data[img_id].category not in ['Untagged', 'No objects']}
