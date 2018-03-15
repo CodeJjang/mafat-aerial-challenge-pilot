@@ -62,7 +62,7 @@ for split in ['train', 'val', 'val1', 'val2', 'test']:
 
 # set up ddrnd
 for split in ['train', 'val', 'trainval', 'test']:
-    name = 'voc_{}'.format(split)
+    name = 'voc_2007_{}'.format(split)
     __sets[name] = (lambda split=split: ddrnd(split))
 
 def get_imdb(name):
