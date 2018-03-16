@@ -27,9 +27,17 @@ The dataset consisted of Oriented Bounding Boxes (Bounding Boxes which are not a
 All the known formats however supports axis aligned Bounding Boxes only, called Horizontal Bounding Boxes. 
 Therefore, I had to wrap each OBB in HBB.
 \\\\
-2. Class with a point instead of Bounding Box
+2. Classes with a point instead of Bounding Box\\
 The solar panel is marked with a point instead of 4 points Bounding Box. Therefore, I've decided to just create a 4 point Bounding Box for it containing the same point multiplied by 4.
-
+\\\\
+3. High resolution images\\
+Some images did not fit into GPU (~50). I decided to ignore them for now.
+\\\\
+4. Subclasses\\
+I decided to ignore subclasses for now, since most of the detection networks modules do not support them.
+\\\\
+5. Falsely annotated images\\
+Some image annotations contained bounding boxes with coordiantes outside of the image. I decided to crop these coordinates to fit inside image.
 \section{State Of The Art Computer Vision Networks}
 ...
 
