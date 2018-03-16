@@ -111,21 +111,68 @@ class PascalVoc:
         return str(xmin), str(ymin), str(xmax), str(ymax)
 
     '''
-    Remove Untagged and No objects images, along with high res images
+    Remove:
+    1. Untagged and No objects images
+    2. High resolution images
     '''
+
     def _filter_images(self, data):
+        initial_len = len(data)
+        Logger.log('Data contains %d images' % initial_len)
+
+        # Remove untagged and no object images
         filtered_data = {img_id: data[img_id] for img_id in data if
                          data[img_id].category not in ['Untagged', 'No objects']}
+        Logger.log('Removed %d untagged and no object images' % (initial_len - len(filtered_data)))
+        initial_len = len(filtered_data)
+
+        # Remove high resolution images
         if self.limit_resolution:
             filtered_data = {img_id: filtered_data[img_id] for img_id in filtered_data if
                              max(filtered_data[img_id].width, filtered_data[img_id].height) <= self.max_resolution}
+            Logger.log('Removed %d high resolution images' % (initial_len - len(filtered_data)))
+
+        Logger.log('Final images amount is %d' % len(filtered_data))
+
         return filtered_data
 
     def _filter_dict_keys(self, dict, keys):
         return {k: dict[k] for k in dict if k in keys}
 
+    def _fix_single_point(self, img_id, pt, width, height):
+        if float(pt[0]) < 0:
+            Logger.log('Image %s contained negative point %s' % (img_id, pt[0]))
+            pt = (str(0), pt[1])
+        elif float(pt[0]) > width:
+            Logger.log('Image %s contained out of width point: %s > %d' % (img_id, pt[0], width))
+            pt = (str(width), pt[1])
+
+        if float(pt[1]) < 0:
+            Logger.log('Image %s contained negative point %s' % (img_id, pt[1]))
+            pt = (pt[0], str(0))
+        elif float(pt[1]) > height:
+            Logger.log('Image %s contained out of height point: %s > %d' % (img_id, pt[1], height))
+            pt = (pt[0], str(height))
+
+        return pt
+
+    def _fix_exceeding_bounding_boxes(self, data):
+        # Remove images whose coordinates exceed the image
+        for img_id in data:
+            img = data[img_id]
+            image_id = img.image_id
+            height = img.height
+            width = img.width
+            for obj in img.objects:
+                p1, p2, p3, p4 = obj.bounding_box.pt1, obj.bounding_box.pt2, obj.bounding_box.pt3, obj.bounding_box.pt4
+                obj.bounding_box.pt1 = self._fix_single_point(image_id, p1, width, height)
+                obj.bounding_box.pt2 = self._fix_single_point(image_id, p2, width, height)
+                obj.bounding_box.pt3 = self._fix_single_point(image_id, p3, width, height)
+                obj.bounding_box.pt4 = self._fix_single_point(image_id, p4, width, height)
+
     def convert(self, aerial_data):
         data = self._filter_images(aerial_data.data)
+        self._fix_exceeding_bounding_boxes(data)
         train_data_len = int((self.train_split_percent / float(100)) * len(data))
         train_data = random.sample(list(data), train_data_len)
         val_data = [val_data for val_data in data if val_data not in train_data]
