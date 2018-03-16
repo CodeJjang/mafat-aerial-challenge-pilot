@@ -72,10 +72,12 @@ class PascalVoc:
                 ET.SubElement(object, "truncated").text = str(0)
                 ET.SubElement(object, "difficult").text = str(0)
                 bb = ET.SubElement(object, "bndbox")
+                xmin, ymin, xmax, ymax = self._obb_to_pascal_hbb(obj.bounding_box.get_points())
+                assert xmin <= xmax < image.width and ymin <= ymax < image.height
                 ET.SubElement(bb, 'xmin').text, \
                 ET.SubElement(bb, 'ymin').text, \
                 ET.SubElement(bb, 'xmax').text, \
-                ET.SubElement(bb, 'ymax').text = self._obb_to_pascal_hbb(obj.bounding_box.get_points())
+                ET.SubElement(bb, 'ymax').text = str(xmin), str(ymin), str(xmax), str(ymax)
 
             tree = ET.ElementTree(root)
             tree.write(fpath)
@@ -104,11 +106,11 @@ class PascalVoc:
         self._rm_dir(annotations_dir_path)
 
     def _obb_to_pascal_hbb(self, obb):
-        xmin = min([x for x, _ in obb])
-        ymin = min([y for _, y in obb])
-        xmax = max([x for x, _ in obb])
-        ymax = max([y for _, y in obb])
-        return str(xmin), str(ymin), str(xmax), str(ymax)
+        xmin = min([float(x) for x, _ in obb])
+        ymin = min([float(y) for _, y in obb])
+        xmax = max([float(x) for x, _ in obb])
+        ymax = max([float(y) for _, y in obb])
+        return float(xmin), float(ymin), float(xmax), float(ymax)
 
     '''
     Remove:
@@ -143,16 +145,16 @@ class PascalVoc:
         if float(pt[0]) < 0:
             Logger.log('Image %s contained negative point %s' % (img_id, pt[0]))
             pt = (str(0), pt[1])
-        elif float(pt[0]) > width:
-            Logger.log('Image %s contained out of width point: %s > %d' % (img_id, pt[0], width))
-            pt = (str(width), pt[1])
+        elif float(pt[0]) >= width:
+            Logger.log('Image %s contained out of width point: %s >= %d' % (img_id, pt[0], width))
+            pt = (str(width - 1), pt[1])
 
         if float(pt[1]) < 0:
             Logger.log('Image %s contained negative point %s' % (img_id, pt[1]))
             pt = (pt[0], str(0))
-        elif float(pt[1]) > height:
-            Logger.log('Image %s contained out of height point: %s > %d' % (img_id, pt[1], height))
-            pt = (pt[0], str(height))
+        elif float(pt[1]) >= height:
+            Logger.log('Image %s contained out of height point: %s >= %d' % (img_id, pt[1], height))
+            pt = (pt[0], str(height - 1))
 
         return pt
 
@@ -213,7 +215,7 @@ if __name__ == '__main__':
                         default=True,
                         help='whether to limit loaded images resolutions')
     parser.add_argument('--max-resolution', dest='max_resolution', type=int,
-                        default=1500,
+                        default=1000,
                         help='max resolution of images', choices=range(1, 5000))
 
     args = parser.parse_args()
