@@ -25,7 +25,7 @@ except NameError:
 
 
 class ddrnd(imdb):
-    def __init__(self, image_set, year=2007, devkit_path=None):
+    def __init__(self, image_set, year='2007', devkit_path=None):
         imdb.__init__(self, 'voc_' + year + '_' + image_set)
         self._year = year
         self._image_set = image_set
@@ -76,11 +76,11 @@ class ddrnd(imdb):
         image_path = os.path.join(self._data_path, 'JPEGImages',
                                   index)
         if os.path.exists(image_path + self._image_ext[0]):
-            return image_path
+            return image_path + self._image_ext[0]
         elif os.path.exists(image_path + self._image_ext[1]):
-            return image_path
+            return image_path + self._image_ext[1]
         elif os.path.exists(image_path + self._image_ext[2]):
-            return image_path
+            return image_path + self._image_ext[2]
         else:
             assert os.path.exists(image_path), \
                 'Path does not exist: {}'.format(image_path)
