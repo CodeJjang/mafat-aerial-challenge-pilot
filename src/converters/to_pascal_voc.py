@@ -22,6 +22,7 @@ class PascalVoc:
         self.train_fname = 'train.txt'
         self.val_fname = 'val.txt'
         self.trainval_fname = 'trainval.txt'
+        self.test_fname = 'test.txt'
         self.images_depth = 3
 
     def _gen_train_file(self, train_data):
@@ -47,6 +48,14 @@ class PascalVoc:
         with open(fpath, 'w') as trainval_file:
             trainval_file.write(content)
             Logger.log('Generated trainval file with ids')
+
+    def _gen_test_file(self, test_data):
+        fpath = os.path.join(self.data_dir_path, self.root_dirname, self.dataset_dirname, self.image_ids_dirname,
+                             self.test_fname)
+        content = '\n'.join(test_data)
+        with open(fpath, 'w') as test_file:
+            test_file.write(content)
+            Logger.log('Generated test file with ids')
 
     def _gen_annotations(self, data):
         dirpath = os.path.join(self.data_dir_path, self.root_dirname, self.dataset_dirname, self.annotations_dirname)
@@ -138,6 +147,14 @@ class PascalVoc:
 
         return filtered_data
 
+    def _get_untagged_images(self, data):
+        # Pick only untagged images
+        filtered_data = {img_id: data[img_id] for img_id in data if
+                         data[img_id].category == 'Untagged'}
+
+        Logger.log('Test images amount is %d' % len(filtered_data))
+        return filtered_data
+
     def _filter_dict_keys(self, dict, keys):
         return {k: dict[k] for k in dict if k in keys}
 
@@ -173,14 +190,15 @@ class PascalVoc:
                 obj.bounding_box.pt4 = self._fix_single_point(image_id, p4, width, height)
 
     def convert(self, aerial_data):
-        data = self._filter_images(aerial_data.data)
-        self._fix_exceeding_bounding_boxes(data)
-        train_data_len = int((self.train_split_percent / float(100)) * len(data))
-        train_data = random.sample(list(data), train_data_len)
-        val_data = [val_data for val_data in data if val_data not in train_data]
-        assert set(train_data) != set(val_data)
-        train_data = self._filter_dict_keys(data, train_data)
-        val_data = self._filter_dict_keys(data, val_data)
+        trainval_data = self._filter_images(aerial_data.data)
+        test_data = self._get_untagged_images(aerial_data.data)
+        self._fix_exceeding_bounding_boxes(trainval_data)
+        train_data_len = int((self.train_split_percent / float(100)) * len(trainval_data))
+        train_data = random.sample(list(trainval_data), train_data_len)
+        val_data = [val_data for val_data in trainval_data if val_data not in train_data]
+        assert set(train_data) != set(val_data) != set(test_data)
+        train_data = self._filter_dict_keys(trainval_data, train_data)
+        val_data = self._filter_dict_keys(trainval_data, val_data)
         trainval_data = {}
         trainval_data.update(train_data)
         trainval_data.update(val_data)
@@ -188,8 +206,9 @@ class PascalVoc:
         self._gen_train_file(train_data)
         self._gen_val_file(val_data)
         self._gen_trainval_file(trainval_data)
+        self._gen_test_file(test_data)
         self._gen_annotations(trainval_data)
-
+        self._gen_annotations(test_data)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Loads aerial annotations')
