@@ -31,13 +31,16 @@ Therefore, I had to wrap each OBB in HBB.
 The solar panel is marked with a point instead of 4 points Bounding Box. Therefore, I've decided to just create a 4 point Bounding Box for it containing the same point multiplied by 4.
 \\\\
 3. High resolution images\\
-Some images did not fit into GPU (~50). I decided to ignore them for now.
+Some images did not fit into GPU (94). I decided to ignore them for now, and taking into account images with max resolution of 1000.
 \\\\
 4. Subclasses\\
 I decided to ignore subclasses for now, since most of the detection networks modules do not support them.
 \\\\
 5. Falsely annotated images\\
 Some image annotations contained bounding boxes with coordiantes outside of the image. I decided to crop these coordinates to fit inside image.
+\\\\
+6. Small objects\\
+The objects appeared in the images are much smaller than standard images networks handle. Therefore, the Region Proposal Network missed all the objects.
 \section{State Of The Art Computer Vision Networks}
 ...
 

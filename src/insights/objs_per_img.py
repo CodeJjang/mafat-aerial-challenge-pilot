@@ -33,3 +33,5 @@ if __name__ == '__main__':
     data = pascal_xmls_to_dicts(ann_path)
     objs_per_img = count_objs_per_image(data)
     print('Max objects per image: ', max(objs_per_img))
+    print('Avg objects per image: ', sum(objs_per_img)/len(objs_per_img))
+    print('Min objects per image: ', min(objs_per_img))
