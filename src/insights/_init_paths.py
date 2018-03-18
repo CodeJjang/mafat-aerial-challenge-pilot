@@ -8,3 +8,5 @@ def add_path(path):
 this_dir = osp.dirname(__file__)
 src_path = osp.join(this_dir, '../converters')
 add_path(src_path)
+src_path = osp.join(this_dir, '../../src')
+add_path(src_path)

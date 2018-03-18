@@ -14,8 +14,18 @@ def pascal_xmls_to_dicts(xmls_path):
                 res.append(BeautifulSoup(xml_file.read(), 'lxml'))
     return res
 
+def _calc_sizes(objects):
+    sizes = []
+    for obj in objects:
+        xmin = float(obj.find('xmin').text)
+        ymin = float(obj.find('ymin').text)
+        xmax = float(obj.find('xmax').text)
+        ymax = float(obj.find('ymax').text)
+        sizes.append(round((xmax - xmin + 1) * (ymax - ymin + 1)))
+    return sizes
+
 def count_objs_per_image(data):
-    return [len(xml.findAll('object')) for xml in data]
+    return [size for xml in data for size in _calc_sizes(xml.findAll('object'))]
 
 
 if __name__ == '__main__':
@@ -32,6 +42,6 @@ if __name__ == '__main__':
     ann_path = os.path.join(args.data_path, 'VOCdevkit2007/VOC2007/Annotations')
     data = pascal_xmls_to_dicts(ann_path)
     objs_per_img = count_objs_per_image(data)
-    print('Max objects per image: ', max(objs_per_img))
-    print('Avg objects per image: ', sum(objs_per_img)/len(objs_per_img))
-    print('Min objects per image: ', min(objs_per_img))
+    print('Max object size: ', max(objs_per_img))
+    print('Avg object size: ', sum(objs_per_img)/len(objs_per_img))
+    print('Min objects size: ', min(objs_per_img))
