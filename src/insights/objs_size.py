@@ -46,4 +46,6 @@ if __name__ == '__main__':
     objs_size_per_image = count_objs_size_per_image(data)
     print('Max object sqrt(area): ', max(objs_size_per_image))
     print('Avg object sqrt(area): ', sum(objs_size_per_image)/len(objs_size_per_image))
+    objs_size_per_image_without_poles = [size for size in objs_size_per_image if size != 1]
+    print('Avg object sqrt(area) without utility poles: ', sum(objs_size_per_image_without_poles) / len(objs_size_per_image_without_poles))
     print('Min objects sqrt(area): ', min(objs_size_per_image))
