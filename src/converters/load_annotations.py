@@ -152,30 +152,30 @@ class AerialData:
                 if label == 'large vehicle':
                     bounding_box = self.create_box(row)
                     sublabel = self.LargeVehicleFeatures(subclass,
-                                                                    open_cargo_area,
-                                                                    vents,
-                                                                    air_conditioner,
-                                                                    wrecked,
-                                                                    enclosed_box,
-                                                                    enclosed_cab,
-                                                                    ladder,
-                                                                    flatbed,
-                                                                    soft_shell_box,
-                                                                    harnessed_to_cart,
-                                                                    color)
+                                                         open_cargo_area,
+                                                         vents,
+                                                         air_conditioner,
+                                                         wrecked,
+                                                         enclosed_box,
+                                                         enclosed_cab,
+                                                         ladder,
+                                                         flatbed,
+                                                         soft_shell_box,
+                                                         harnessed_to_cart,
+                                                         color)
                     obj = self.Object(bounding_box, label, sublabel)
                     inner_data.objects.append(obj)
                 elif label == 'small vehicle':
                     bounding_box = self.create_box(row)
                     sublabel = self.SmallVehicleFeatures(subclass,
-                                                                    sunroof,
-                                                                    taxi,
-                                                                    luggage_carrier,
-                                                                    open_cargo_area,
-                                                                    enclosed_cab,
-                                                                    wrecked,
-                                                                    spare_wheel,
-                                                                    color)
+                                                         sunroof,
+                                                         taxi,
+                                                         luggage_carrier,
+                                                         open_cargo_area,
+                                                         enclosed_cab,
+                                                         wrecked,
+                                                         spare_wheel,
+                                                         color)
                     obj = self.Object(bounding_box, label, sublabel)
                     inner_data.objects.append(obj)
                 elif label == 'solar panel':
@@ -184,15 +184,16 @@ class AerialData:
                     inner_data.objects.append(obj)
                 elif label == 'utility pole':
                     bounding_box = self.BoundingBox((row[1], row[2]),
-                                                               (row[1], row[2]),
-                                                               (row[1], row[2]),
-                                                               (row[1], row[2]))
+                                                    (str(float(row[1]) + 1), row[2]),
+                                                    (str(float(row[1]) + 1), str(float(row[2]) - 1)),
+                                                    (row[1], str(float(row[2]) - 1)))
                     obj = self.Object(bounding_box, label)
                     inner_data.objects.append(obj)
                 else:
                     raise RuntimeError('Unrecognized class %s' % label)
         Logger.log('Finished loading aerial data files')
         self._cache()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Loads aerial annotations')

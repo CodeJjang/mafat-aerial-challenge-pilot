@@ -9,11 +9,12 @@ from utils.logger import Logger
 
 
 class PascalVoc:
-    def __init__(self, data_dir_path, train_split_percent, limit_resolution, max_resolution):
+    def __init__(self, data_dir_path, train_split_percent, limit_resolution, max_resolution, omit_utility_poles):
         self.data_dir_path = data_dir_path
         self.train_split_percent = train_split_percent
         self.limit_resolution = limit_resolution
         self.max_resolution = max_resolution
+        self.omit_utility_poles = omit_utility_poles
         self.root_dirname = 'VOCdevkit2007'
         self.dataset_dirname = 'VOC2007'
         self.image_ids_dirname = 'ImageSets/Main'
@@ -125,15 +126,29 @@ class PascalVoc:
     Remove:
     1. Untagged and No objects images
     2. High resolution images
+    3. Utility poles
     '''
 
     def _filter_images(self, data):
         initial_len = len(data)
+        filtered_data = data
         Logger.log('Data contains %d images' % initial_len)
 
+        # Remove high resolution images
+        if self.omit_utility_poles:
+            omitted_images = 0
+            for img_id in filtered_data:
+                original_objects_len = len(filtered_data[img_id].objects)
+                filtered_data[img_id].objects = [obj for obj in filtered_data[img_id].objects if
+                                                 obj.label != 'utility pole']
+                if len(filtered_data[img_id].objects) == 0 and original_objects_len > 0:
+                    filtered_data[img_id].category = 'No objects'
+                    omitted_images += 1
+            Logger.log('Filtered utility poles from images, %d images was marked with \'No objects\'' % omitted_images)
+
         # Remove untagged and no object images
-        filtered_data = {img_id: data[img_id] for img_id in data if
-                         data[img_id].category not in ['Untagged', 'No objects']}
+        filtered_data = {img_id: filtered_data[img_id] for img_id in filtered_data if
+                         filtered_data[img_id].category not in ['Untagged', 'No objects']}
         Logger.log('Removed %d untagged and no object images' % (initial_len - len(filtered_data)))
         initial_len = len(filtered_data)
 
@@ -142,6 +157,7 @@ class PascalVoc:
             filtered_data = {img_id: filtered_data[img_id] for img_id in filtered_data if
                              max(filtered_data[img_id].width, filtered_data[img_id].height) <= self.max_resolution}
             Logger.log('Removed %d high resolution images' % (initial_len - len(filtered_data)))
+            initial_len = len(filtered_data)
 
         Logger.log('Final images amount is %d' % len(filtered_data))
 
@@ -210,6 +226,7 @@ class PascalVoc:
         self._gen_annotations(trainval_data)
         self._gen_annotations(test_data)
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Loads aerial annotations')
     parser.add_argument('--train_tags', dest='train_tags', type=str,
@@ -233,6 +250,9 @@ if __name__ == '__main__':
     parser.add_argument('--limit-resolution', dest='limit_resolution', type=bool,
                         default=True,
                         help='whether to limit loaded images resolutions')
+    parser.add_argument('--omit-utility-poles', dest='omit_utility_poles', type=bool,
+                        default=True,
+                        help='whether to remove utility poles annotations')
     parser.add_argument('--max-resolution', dest='max_resolution', type=int,
                         default=1000,
                         help='max resolution of images', choices=range(1, 5000))
@@ -246,5 +266,6 @@ if __name__ == '__main__':
     pascal_voc = PascalVoc(args.data_path,
                            args.train_split_percent,
                            args.limit_resolution,
-                           args.max_resolution)
+                           args.max_resolution,
+                           args.omit_utility_poles)
     pascal_voc.convert(data)
