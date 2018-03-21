@@ -85,6 +85,11 @@ class roibatchLoader(data.Dataset):
         # if the image need to crop, crop to the target size.
         ratio = self.ratio_list_batch[index]
 
+        '''
+        Disable cropping for now, in order to help detecting small objects
+        '''
+        self._roidb[index_ratio]['need_crop'] = False
+
         if self._roidb[index_ratio]['need_crop']:
             if ratio < 1:
                 # this means that data_width << data_height, we need to crop the
