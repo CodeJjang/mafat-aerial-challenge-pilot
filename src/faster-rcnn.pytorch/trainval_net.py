@@ -182,7 +182,7 @@ if __name__ == '__main__':
   elif args.dataset == 'ddrnd':
       args.imdb_name = "voc_2007_train"
       args.imdbval_name = "voc_2007_test"
-      args.set_cfgs = ['ANCHOR_SCALES', '[1, 2, 4, 8, 16]', 'ANCHOR_RATIOS', '[0.5,1,2]', 'MAX_NUM_GT_BOXES', '92']
+      args.set_cfgs = ['ANCHOR_SCALES', '[1, 2, 4, 8, 16]', 'ANCHOR_RATIOS', '[0.5,1,2]', 'MAX_NUM_GT_BOXES', '164']
 
   args.cfg_file = "cfgs/{}_ls.yml".format(args.net) if args.large_scale else "cfgs/{}.yml".format(args.net)
 
@@ -301,7 +301,7 @@ if __name__ == '__main__':
 
   iters_per_epoch = int(train_size / args.batch_size)
 
-  for epoch in range(args.start_epoch, args.max_epochs):
+  for epoch in range(args.start_epoch, args.max_epochs + 1):
     # setting to train mode
     fasterRCNN.train()
     loss_temp = 0
