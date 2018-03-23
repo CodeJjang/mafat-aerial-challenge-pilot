@@ -15,7 +15,7 @@ def pascal_xmls_to_dicts(xmls_path):
     return res
 
 def count_objs_per_image(data):
-    return [len(xml.findAll('object')) for xml in data]
+    return [len(xml.findAll('object')) for xml in data if len(xml.findAll('object')) > 0]
 
 
 if __name__ == '__main__':
