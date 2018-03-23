@@ -19,7 +19,16 @@ Background...
 ...
 
 \section{The Dataset}
-...
+Most of the dataset does not contain objects at all. Only 51 images are fully tagged. 2161 images are partially tagged, 7121 images were verified to contain no objects at all, and 36 images are untagged.\\
+Regarding labels, the dataset definitely biases towards small vehicles, which appear more than the other classes, combined. Distribution can be seen in Figure 1:
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.7\linewidth]{"charts/Dataset Coarse Grained Labels Distribution"}
+\caption{Dataset Coarse Grained Labels Distribution}
+\label{fig:Dataset Coarse Grained Labels Distribution}
+\end{figure}
+
+
 
 \section{Challenges}
 1. Oriented Bounding Box \\
@@ -28,7 +37,7 @@ All the known formats however supports axis aligned Bounding Boxes only, called 
 Therefore, I had to wrap each OBB in HBB.
 \\\\
 2. Classes with a point instead of Bounding Box\\
-The solar panel is marked with a point instead of 4 points Bounding Box. Therefore, I've decided to just create a 4 point Bounding Box for it containing the same point multiplied by 4.
+The utility pole class objects are marked with a point instead of 4 points Bounding Box. Therefore, for the beginning I've decided to remove all the utility poles objects from the dataset (and also images which contained only utility poles, 533 in total), as they are extremely difficult to detect.
 \\\\
 3. High resolution images\\
 Some images did not fit into GPU (94). I decided to ignore them for now, and taking into account images with max resolution of 1000.

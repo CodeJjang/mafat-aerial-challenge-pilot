@@ -1,0 +1,13 @@
+1. Anchor scales [1, 2, 4, 8, 16] and anchor size = 16.
+Trained on 3 classes: small, large and solar panel.
+Only images up to 1k.
+15 epochs.
+AP for large vehicle = 0.7531
+AP for small vehicle = 0.8962
+/home/cyb/aviad/pycharm/src/faster-rcnn.pytorch/lib/datasets/voc_eval.py:204: RuntimeWarning: invalid value encountered in true_divide
+  rec = tp / float(npos)
+/home/cyb/aviad/pycharm/src/faster-rcnn.pytorch/lib/datasets/voc_eval.py:45: RuntimeWarning: invalid value encountered in greater_equal
+  if np.sum(rec >= t) == 0:
+AP for solar panel = 0.0000
+Mean AP = 0.5498
+~~~~~~~~
