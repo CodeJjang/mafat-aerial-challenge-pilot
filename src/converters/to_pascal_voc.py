@@ -248,7 +248,7 @@ if __name__ == '__main__':
                         default=True,
                         help='whether to load cached aerial data or generate from scratch')
     parser.add_argument('--limit-resolution', dest='limit_resolution', type=bool,
-                        default=True,
+                        default=False,
                         help='whether to limit loaded images resolutions')
     parser.add_argument('--omit-utility-poles', dest='omit_utility_poles', type=bool,
                         default=True,
