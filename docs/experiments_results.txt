@@ -1,5 +1,5 @@
 1. Anchor scales [1, 2, 4, 8, 16] and anchor size = 16.
-Trained on 3 classes: small, large and solar panel.
+Trained on 3 classes: small, large and solar panel (solar panel did not appear in filtered dataset).
 Only images up to 1k.
 15 epochs.
 AP for large vehicle = 0.7531
