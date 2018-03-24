@@ -28,9 +28,30 @@ Regarding labels, the dataset definitely biases towards small vehicles, which ap
 \label{fig:Dataset Coarse Grained Labels Distribution}
 \end{figure}
 
-As mentioned before, large and small vehicles are further tagged with fine-grained labels.
-charts...
-charts...
+As mentioned before, large and small vehicles are further tagged with fine-grained labels, consisted of 3 categories: subclass, feature and color.\\
+The large vehicle class has only hundreds of subclass tags, while small vehicle has many thousands, as seen in Figure 2:
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.7\linewidth]{"charts/Dataset Subclass Labels Distribution"}
+\caption{Dataset Subclass Labels Distribution}
+\label{fig:Dataset Subclass Labels Distribution}
+\end{figure}
+
+The same goes with feature tags, as seen in Figure 3:
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.7\linewidth]{"charts/Dataset Feature Labels Distribution"}
+\caption{Dataset Feature Labels Distribution}
+\label{fig:Dataset Feature Labels Distribution}
+\end{figure}
+
+And also with color tags, as seen in Figure 4.
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.7\linewidth]{"charts/Dataset Color Labels Distribution"}
+\caption{Dataset Color Labels Distribution}
+\label{fig:Dataset Color Labels Distribution}
+\end{figure}
 
 On average, there are 8 objects in an image, while the most crowded image contains 164 objects altogether.
 
@@ -44,21 +65,19 @@ Therefore, I had to wrap each OBB in HBB.
 2. Classes with a point instead of Bounding Box\\
 The utility pole class objects are marked with a point instead of 4 points Bounding Box. Therefore, for the beginning I've decided to remove all the utility poles objects from the dataset (and also images which contained only utility poles, 533 in total), as they are extremely difficult to detect.
 \\\\
-3. High resolution images\\
-Some images did not fit into GPU (94). I decided to ignore them for now, and taking into account images with max resolution of 1000.
+3. Subclasses\\
+I decided to ignore the fine-grained classification for now, since most of the detection networks modules do not support them.
 \\\\
-4. Subclasses\\
-I decided to ignore subclasses for now, since most of the detection networks modules do not support them.
-\\\\
-5. Falsely annotated images\\
+4. Falsely annotated images\\
 Some image annotations contained bounding boxes with coordiantes outside of the image. I decided to crop these coordinates to fit inside image.
 \\\\
-6. Small objects\\
-The objects appeared in the images are much smaller than standard images networks handle. Therefore, the Region Proposal Network missed all the objects.
+5. Small objects\\
+The objects appeared in the images are much smaller than standard images networks handle. Therefore, the Region Proposal Network missed all the objects. I had to fine-tune some RPN related hyper-parameters in order to be able to detect the small objects in the dataset.
 \section{State Of The Art Computer Vision Networks}
 ...
 
 \section{Experiments Results}
-...
+I mostly used default learning-related hyper parameters in the following experiments, and fine-tuned the hyper parameters which would help the network to better learn the small sized objects of the dataset. There are more than 30 hyper parameters, so I'll mention the default of the most important onces, and of course each experiment will describe the hyper parameters tuned for the experiment.\\
+Learning rate was 0.001, optimizer was SGD with 0.9 momentum, weight decay was 5e-4, 
 
 \end{document}
