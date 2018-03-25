@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.1.26)  24 MAR 2018 17:28
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.1.26)  26 MAR 2018 01:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -175,49 +175,71 @@ Package pdftex.def Info: "charts/Dataset Color Labels Distribution".png used on
  input line 51.
 (pdftex.def)             Requested size: 241.49895pt x 135.71864pt.
 
+Underfull \hbox (badness 10000) in paragraph at lines 48--57
+
+ []
+
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 60--76
+Underfull \hbox (badness 10000) in paragraph at lines 58--59
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 60--76
+<"charts/Dataset Objects Size Distribution".png, id=14, 455.45157pt x 304.13625
+pt>
+File: "charts/Dataset Objects Size Distribution".png Graphic file (type png)
+ <use "charts/Dataset Objects Size Distribution".png>
+Package pdftex.def Info: "charts/Dataset Objects Size Distribution".png used on
+ input line 63.
+(pdftex.def)             Requested size: 241.49895pt x 161.26569pt.
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 69--85
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 60--76
+Underfull \hbox (badness 10000) in paragraph at lines 69--85
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 60--76
+Underfull \hbox (badness 10000) in paragraph at lines 69--85
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 69--85
 
  []
 
 [2 <./charts/Dataset Subclass Labels Distribution.png (PNG copy)> <./charts/Dat
 aset Feature Labels Distribution.png (PNG copy)>] [3 <./charts/Dataset Color La
-bels Distribution.png (PNG copy)>] [4] (./report.aux) ) 
+bels Distribution.png (PNG copy)> <./charts/Dataset Objects Size Distribution.p
+ng (PNG copy)>] [4] (./report.aux) ) 
 Here is how much of TeX's memory you used:
- 1510 strings out of 494953
- 22330 string characters out of 6180977
- 75795 words of memory out of 5000000
- 4801 multiletter control sequences out of 15000+600000
+ 1516 strings out of 494953
+ 22611 string characters out of 6180977
+ 76803 words of memory out of 5000000
+ 4806 multiletter control sequences out of 15000+600000
  7280 words of font info for 26 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  37i,6n,23p,410b,227s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmr17.pfb>
-Output written on report.pdf (4 pages, 143185 bytes).
+</usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mr17.pfb>
+Output written on report.pdf (4 pages, 182644 bytes).
 PDF statistics:
- 37 PDF objects out of 1000 (max. 8388607)
+ 38 PDF objects out of 1000 (max. 8388607)
  22 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 21 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 26 words of extra memory for PDF output out of 10000 (max. 10000000)
 
