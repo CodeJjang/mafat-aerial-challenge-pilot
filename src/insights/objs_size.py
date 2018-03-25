@@ -40,7 +40,7 @@ if __name__ == '__main__':
                         default='../faster-rcnn.pytorch/data',
                         help='data dir path')
     parser.add_argument('--csv_data', dest='csv_data_path', type=str,
-                        default='../../docs/charts/raw\ data/',
+                        default='../../docs/charts/raw data/',
                         help='csv data dir path')
 
     args = parser.parse_args()
@@ -65,14 +65,14 @@ if __name__ == '__main__':
     objs_size_per_image_per_solar_panel = count_objs_size_per_image(data, 'solar panel')
     objs_size_per_image_per_solar_panel.sort()
 
-    final_csv = 'large vehicle, small vehicle, solar panel' + '/n'
+    final_csv = 'large vehicle, small vehicle, solar panel' + '\n'
     for i in range(max(len(objs_size_per_image_per_large_vehicle), len(objs_size_per_image_per_small_vehicle), len(objs_size_per_image_per_solar_panel))):
         row = '%s,%s,%s' % (
             objs_size_per_image_per_large_vehicle[i] if i < len(objs_size_per_image_per_large_vehicle) else '',
             objs_size_per_image_per_small_vehicle[i] if i < len(objs_size_per_image_per_small_vehicle) else '',
             objs_size_per_image_per_solar_panel[i] if i < len(objs_size_per_image_per_solar_panel) else '',
         )
-        final_csv += row + '/n'
-    with open(args.csv_data_path + 'Labels Size Distributions.odc', 'w+') as csv_file:
+        final_csv += row + '\n'
+    with open(args.csv_data_path + 'Labels Size Distributions.csv', 'w+') as csv_file:
         csv_file.write(final_csv)
     print('Wrote data to csv data dir path')
