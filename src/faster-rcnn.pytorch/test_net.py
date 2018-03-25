@@ -128,8 +128,8 @@ if __name__ == '__main__':
       args.imdbval_name = "vg_150-50-50_minival"
       args.set_cfgs = ['ANCHOR_SCALES', '[4, 8, 16, 32]', 'ANCHOR_RATIOS', '[0.5,1,2]']
   elif args.dataset == 'ddrnd':
-      args.imdb_name = "voc_2007_trainval"
-      args.imdbval_name = "voc_2007_test"
+      args.imdb_name = "voc_2007_train"
+      args.imdbval_name = "voc_2007_val"
       args.set_cfgs = ['ANCHOR_SCALES', '[1, 2, 4, 8, 16]', 'ANCHOR_RATIOS', '[0.5,1,2]']
 
   args.cfg_file = "cfgs/{}_ls.yml".format(args.net) if args.large_scale else "cfgs/{}.yml".format(args.net)
