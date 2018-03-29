@@ -134,7 +134,7 @@ class PascalVoc:
         filtered_data = data
         Logger.log('Data contains %d images' % initial_len)
 
-        # Remove utility poles
+        # Remove high resolution images
         if self.omit_utility_poles:
             omitted_images = 0
             for img_id in filtered_data:

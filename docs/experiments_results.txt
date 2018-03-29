@@ -1,8 +1,10 @@
-1. Anchor scales [1, 2, 4, 8, 16] and anchor size = 16.
+1.
+Anchor scales [1, 2, 4, 8, 16] and anchor size = 16.
 Trained on 3 classes: small, large and solar panel (solar panel did not appear in filtered dataset).
 Only images up to 1k.
 No crop.
 15 epochs.
+Scale = 600.
 AP for large vehicle = 0.7531
 AP for small vehicle = 0.8962
 /home/cyb/aviad/pycharm/src/faster-rcnn.pytorch/lib/datasets/voc_eval.py:204: RuntimeWarning: invalid value encountered in true_divide
@@ -12,15 +14,40 @@ AP for small vehicle = 0.8962
 AP for solar panel = 0.0000
 Mean AP = 0.5498
 ~~~~~~~~
-2. Anchor scales [1, 2, 4, 8, 16] and anchor size = 16.
+2.
+Anchor scales [1, 2, 4, 8, 16] and anchor size = 16.
 Trained on 3 classes: small, large and solar panel.
 All images.
 No crop.
+Scale = 600.
 15 epochs.
 AP for large vehicle = 0.3520
 AP for small vehicle = 0.7978
 AP for solar panel = 0.0529
 Mean AP = 0.4009
 ~~~~~~~~
-3. 02 server runs Scale 1600, no crop
-
+3.
+Anchor scales [1, 2, 4, 8, 16] and anchor size = 16.
+Trained on 3 classes: small, large and solar panel.
+All images.
+No crop.
+15 epochs.
+Scale = 1600
+15 epochs.
+AP for large vehicle = 0.4987
+AP for small vehicle = 0.8917
+AP for solar panel = 0.6431
+Mean AP = 0.6778
+~~~~~~~~
+4.
+Anchor scales [1, 2, 4, 8, 16] and anchor size = 16.
+Trained on 3 classes: small, large and solar panel.
+All images.
+No crop.
+7 epochs.
+Scale = 600, 1600
+AP for large vehicle = 0.3340
+AP for small vehicle = 0.7906
+AP for solar panel = 0.1700
+Mean AP = 0.4316
+~~~~~~~~

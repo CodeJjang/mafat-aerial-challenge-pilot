@@ -19,6 +19,9 @@ Background...
 ...
 
 \section{The Dataset}
+\subsection{Brief}
+Dataset contains of 9xxx images, bla bla..
+\subsection{Analyses}
 Most of the dataset does not contain objects at all. Only 51 images are fully tagged. 2161 images are partially tagged, 7121 images were verified to contain no objects at all, and 36 images are untagged.\\
 Regarding labels, the dataset definitely biases towards small vehicles, which appear more than the other classes, combined. Distribution can be seen in Figure 1:
 \begin{figure}[!h]
@@ -64,6 +67,9 @@ In Figure 5 we can see just how small are our objects, and what is their frequen
 \caption{Dataset Objects Size Distribution}
 \label{fig:Dataset Objects Size Distribution}
 \end{figure}
+
+\subsection{Dataset splits}
+I chose to randomly split 90% of the dataset as a training set, and the rest 10% is used as a validation set. Test set should be supplied by the competition organizers.
 
 \section{Challenges}
 1. Oriented Bounding Box \\
