@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.1.26)  27 APR 2018 01:23
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.1.26)  27 APR 2018 01:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -151,21 +151,6 @@ Overfull \hbox (3.97281pt too wide) in paragraph at lines 28--29
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-
-! LaTeX Error: There's no line here to end.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.33 I
-      n the detection of Subclass and Colors classes, each detection should ...
-
-Your command was ignored.
-Type  I <command> <return>  to replace it with another command,
-or  <return>  to continue without it.
-
-
 <"charts/Dataset Coarse Grained Labels Distribution".png, id=10, 410.2828pt x 2
 36.38312pt>
 File: "charts/Dataset Coarse Grained Labels Distribution".png Graphic file (typ
