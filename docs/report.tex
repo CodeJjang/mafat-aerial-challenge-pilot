@@ -11,12 +11,29 @@
 \date{}
 \maketitle
 
-\begin{b}
-Background...
-\end{b}
 
 \section{The Task}
-...
+There are mainly four types of tasks in the field of Object Recognition in Computer Vision: Object Classification and Localization, in which we need to classify whether an object appears in an image or not, along with a surrounding bounding box. Object Detection, which is like the previous task but now multiple objects are allowed per image. Semantic Segmantation, in which we need to label (usually by coloring) each pixel in an image with a category label, and finally Instance Segmentation, in which we need detect multiple objects per image and also color (label) their exact pixels.\\
+In this challenge, the task is of detection type. More precisely, we need to detect 4 coarse grained classes and perform fine grained classification of objects in aerial imagery.\\
+The coarse grained classes are Small Vehicle, Large Vehicle, Solar Panel and Utility Pole. Small and Large Vehicle classes have further fine grained features we need to detect: Subclass, Features and Color, as following:\\
+\begin{enumerate}
+\item Small Vehicle
+	\begin{enumerate}
+		\item Subclasses: Sedan, Hatchback, Minivan, Van, Pickup truck, Jeep, Public vehicle.
+		\item Features: Sunroof, Taxi, Luggage carrier, Open cargo area, enclosed cab, Wrecked, Spare wheel.
+		\item Colors: Yellow, Red, Blue, Black, Silver/Grey, White, Other.
+	\end{enumerate}
+\item Large Vehicle
+	\begin{enumerate}
+	\item Subclasses: Truck, Light Truck, Concrete mixer truck, Dedicated Agricultural vehicle, Crane truck, Prime mover, Tanker, Bus, Minibus.
+	\item Features: Open cargo area, Vents, Air conditioner, Wrecked, Enclosed box, Enclosed cab, Ladder, Flatbed, Soft shell box, Harnessed to a cart.
+	\item Colors: Yellow, Red, Blue, Black, Silver/Grey, White, Other.
+	\end{enumerate}
+\end{enumerate}\\
+In the detection of Subclass and Colors classes, each detection should include a single value, while the Features detection has to include multiple values (has sunroof? has luggage carrier? etc).
+
+\section{Evaluation}
+Tell about eval methods...
 
 \section{The Dataset}
 \subsection{Brief}
@@ -127,11 +144,11 @@ Solar Panel AP = 0.6431\\
 mAP = 0.6778
 
 \subsection{Experiment 4}
-I now wanted to test the combination the scale parameter values, thus I set the scale size to be [600, 1600] (meaning each image would be scaled twice, by the two factors).\\
+I now wanted to test the combination the scale parameter values, thus, I set the scale size to be [600, 1600] (meaning each image would be scaled twice, by the two factors). All other parameters remained the same.\\
 Results:\\
-Large Vehicle AP = 0.4987\\
-Small Vehicle AP = 0.8917\\
-Solar Panel AP = 0.6431\\
-mAP = 0.6778
+Large Vehicle AP = 0.3340\\
+Small Vehicle AP = 0.7906\\
+Solar Panel AP = 0.1700\\
+mAP = 0.4316
 
 \end{document}
