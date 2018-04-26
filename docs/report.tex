@@ -23,32 +23,29 @@ Background...
 Dataset contains of 9xxx images, bla bla..
 \subsection{Analyses}
 Most of the dataset does not contain objects at all. Only 51 images are fully tagged. 2161 images are partially tagged, 7121 images were verified to contain no objects at all, and 36 images are untagged.\\
-Regarding labels, the dataset definitely biases towards small vehicles, which appear more than the other classes, combined. Distribution can be seen in Figure 1:
+Regarding labels, the dataset definitely biases towards small vehicles, which appear more than the other classes, combined. Distribution can be seen in Figure 1.
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.7\linewidth]{"charts/Dataset Coarse Grained Labels Distribution"}
 \caption{Dataset Coarse Grained Labels Distribution}
 \label{fig:Dataset Coarse Grained Labels Distribution}
 \end{figure}
-
 As mentioned before, large and small vehicles are further tagged with fine-grained labels, consisted of 3 categories: subclass, feature and color.\\
-The large vehicle class has only hundreds of subclass tags, while small vehicle has many thousands, as seen in Figure 2:
+The large vehicle class has only hundreds of subclass tags, while small vehicle has many thousands, as seen in Figure 2.
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.7\linewidth]{"charts/Dataset Subclass Labels Distribution"}
 \caption{Dataset Subclass Labels Distribution}
 \label{fig:Dataset Subclass Labels Distribution}
 \end{figure}
-
-The same goes with feature tags, as seen in Figure 3:
+The same goes with feature tags, as seen in Figure 3,
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.7\linewidth]{"charts/Dataset Feature Labels Distribution"}
 \caption{Dataset Feature Labels Distribution}
 \label{fig:Dataset Feature Labels Distribution}
 \end{figure}
-
-And also with color tags, as seen in Figure 4.
+and also with color tags, as seen in Figure 4.
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.7\linewidth]{"charts/Dataset Color Labels Distribution"}
@@ -69,16 +66,19 @@ In Figure 5 we can see just how small are our objects, and what is their frequen
 \end{figure}
 
 \subsection{Dataset splits}
-I chose to randomly split 90% of the dataset as a training set, and the rest 10% is used as a validation set. Test set should be supplied by the competition organizers.
+I chose to randomly select 90\% of the dataset as training set and the rest 10\% as validation set. Test set should be supplied by the competition organizers.\\
+A small percentage of validation set could impose a set which does not distribute as the training set, resulting in worse results in test time.\\
+However, I've still decided to stick with this split since there is no much data and due to the fact that I'm going to train on the full dataset anyway before submitting results (in order to slightly increase the accuracies).
 
 \section{Challenges}
 1. Oriented Bounding Box \\
 The dataset consisted of Oriented Bounding Boxes (Bounding Boxes which are not axis aligned). \\
-All the known formats however supports axis aligned Bounding Boxes only, called Horizontal Bounding Boxes. 
-Therefore, I had to wrap each OBB in HBB.
+The popular dataset formats (COCO, PASCAL VOC, etc) however supports axis aligned Bounding Boxes only, called Horizontal Bounding Boxes. 
+Therefore, I had to wrap each OBB in HBB.  
+OBB should be easier to learn because they are less strict than HBB, but due to their nature the expected score would be smaller than OBB, which better wraps the objects.
 \\\\
 2. Classes with a point instead of Bounding Box\\
-The utility pole class objects are marked with a point instead of 4 points Bounding Box. Therefore, for the beginning I've decided to remove all the utility poles objects from the dataset (and also images which contained only utility poles, 533 in total), as they are extremely difficult to detect.
+The utility pole class objects are marked with a point instead of 4 points Bounding Box. Therefore, for the beginning I've decided to remove all the utility poles objects from the dataset (and also images which contained only utility poles, 533 in total), as they are extremely difficult to detect and posed several problems in the training.
 \\\\
 3. Subclasses\\
 I decided to ignore the fine-grained classification for now, since most of the detection networks modules do not support them.
@@ -87,12 +87,51 @@ I decided to ignore the fine-grained classification for now, since most of the d
 Some image annotations contained bounding boxes with coordiantes outside of the image. I decided to crop these coordinates to fit inside image.
 \\\\
 5. Small objects\\
-The objects appeared in the images are much smaller than standard images networks handle. Therefore, the Region Proposal Network missed all the objects. I had to fine-tune some RPN related hyper-parameters in order to be able to detect the small objects in the dataset.
+The objects appeared in the images are much smaller than standard objects networks usually try to detect. Therefore, the Region Proposal Network missed all the objects. I had to fine-tune some RPN related hyper-parameters in order to be able to detect the small objects in the dataset. The most important parameter was to set anchor scales to [1, 2, 4, 8, 16], which helped covering various objects size.
+6. High resolution images\\
+About 100 images in the dataset has various resolutions reaching up to 4k. Including those images in the dataset 
 \section{State Of The Art Computer Vision Networks}
 ...
 
 \section{Experiments Results}
-I mostly used default learning-related hyper parameters in the following experiments, and fine-tuned the hyper parameters which would help the network to better learn the small sized objects of the dataset. There are more than 30 hyper parameters, so I'll mention the default of the most important onces, and of course each experiment will describe the hyper parameters tuned for the experiment.\\
-Learning rate was 0.001, optimizer was SGD with 0.9 momentum, weight decay was 5e-4, 
+I mostly used default learning-related hyper parameters in the following experiments, and fine-tuned the hyper parameters which would help the network to better learn the small sized objects of the dataset. There are more than 30 hyper parameters, so I'll mention the most important ones, and of course each experiment will describe the hyper parameters tuned for the experiment.\\
+Learning rate was 0.001, optimizer was SGD with 0.9 momentum, weight decay was 5e-4, epochs number was 15, RPN anchor ratios were [0.5,1,2] and RPN feature stride was 16.
+\\\\
+The initial experiments results (before I found the baseline hyper paremeters setup) are omitted, because the network didn't even train. For the same reason, experiments which contained bugs (due to the error and trial nature of the process) are also not metioned.
+\\\\
+I also did not see reasons to collect training plots regarding loss and accuracies until I started optimizing them, since the first upcoming experiments have other targets.
+
+\subsection{Experient 1}
+This is the first experiment which yielded actual results.\\
+I used only images up to 1k resolution, with 2 classes: Small Vehicle and Large Vehicle (Solar Panel did not appear in filtered dataset).
+Scale used was 600 (which didn't basically affect anything since all the images were around 1000x600), and batch size was 2.\\
+Results:\\
+Large Vehicle AP = 0.7531\\
+Small Vehicle AP = 0.8962\\
+mAP = 0.82465.\\
+
+\subsection{Experient 2}
+In this experiment the exact same parameters were used, but now the training consisted of all the images. The scale parameter now took effect and actually rescaled all the large images small side to be 600 (i.e. 4000x2500 image would now be 960x600).\\
+Results:\\
+Large Vehicle AP = 0.3520\\
+Small Vehicle AP = 0.7978\\
+Solar Panel AP = 0.0529\\
+mAP = 0.4009
+
+\subsection{Experiment 3}
+Again, same parameters were used, but now I wanted to test the effect of the scale size on the learning. Therefore, I used the maximum scale size I could (due to 12GB GPU memory restriction), which was 1600.\\
+Results:\\
+Large Vehicle AP = 0.4987\\
+Small Vehicle AP = 0.8917\\
+Solar Panel AP = 0.6431\\
+mAP = 0.6778
+
+\subsection{Experiment 4}
+I now wanted to test the combination the scale parameter values, thus I set the scale size to be [600, 1600] (meaning each image would be scaled twice, by the two factors).\\
+Results:\\
+Large Vehicle AP = 0.4987\\
+Small Vehicle AP = 0.8917\\
+Solar Panel AP = 0.6431\\
+mAP = 0.6778
 
 \end{document}
