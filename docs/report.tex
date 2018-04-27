@@ -14,8 +14,8 @@
 
 \section{The Task}
 There are mainly four types of tasks in the field of Object Recognition in Computer Vision: Object Classification and Localization, in which we need to classify whether an object appears in an image or not, along with a surrounding bounding box. Object Detection, which is like the previous task but now multiple objects are allowed per image. Semantic Segmantation, in which we need to label (usually by coloring) each pixel in an image with a category label, and finally Instance Segmentation, in which we need detect multiple objects per image and also color (label) their exact pixels.\\
-In this challenge, the task is of detection type. More precisely, we need to detect 4 coarse grained classes and perform fine grained classification of objects in aerial imagery.\\
-The coarse grained classes are Small Vehicle, Large Vehicle, Solar Panel and Utility Pole. Small and Large Vehicle classes have further fine grained features we need to detect: Subclass, Features and Color, as following:\\
+In this challenge, the task is in the Object Detection field. More precisely, we need to detect 4 coarse grained classes and perform fine grained classification of objects in aerial imagery.\\
+The coarse grained classes are Small Vehicle, Large Vehicle, Solar Panel and Utility Pole. Small and Large Vehicle classes have further fine grained features we need to detect, as following:\\
 \begin{enumerate}
 \item Small Vehicle
 	\begin{enumerate}
@@ -37,7 +37,19 @@ Tell about eval methods...
 
 \section{The Dataset}
 \subsection{Brief}
-Dataset contains of 9xxx images, bla bla..
+The dataset contains thousands of aerial images, taken from diverse geographical locations, different times, resolutions, area coverage and photo conditions (weather, angles and lighting). The resolutions vary between 5cm to 15cm Ground Sample Distance (the distance between pixel centers measured on the ground). Some samples:\\
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1\linewidth]{"images/im1"}
+\end{figure}
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1\linewidth]{"images/im2"}
+\end{figure}
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1\linewidth]{"images/im3"}
+\end{figure}
 \subsection{Analyses}
 Most of the dataset does not contain objects at all. Only 51 images are fully tagged. 2161 images are partially tagged, 7121 images were verified to contain no objects at all, and 36 images are untagged.\\
 Regarding labels, the dataset definitely biases towards small vehicles, which appear more than the other classes, combined. Distribution can be seen in Figure 1.
@@ -107,7 +119,7 @@ Some image annotations contained bounding boxes with coordiantes outside of the 
 The objects appeared in the images are much smaller than standard objects networks usually try to detect. Therefore, the Region Proposal Network missed all the objects. I had to fine-tune some RPN related hyper-parameters in order to be able to detect the small objects in the dataset. The most important parameter was to set anchor scales to [1, 2, 4, 8, 16], which helped covering various objects size.
 6. High resolution images\\
 About 100 images in the dataset has various resolutions reaching up to 4k. Including those images in the dataset 
-\section{State Of The Art Computer Vision Networks}
+\section{State Of The Art Object Recognition Networks}
 ...
 
 \section{Experiments Results}
