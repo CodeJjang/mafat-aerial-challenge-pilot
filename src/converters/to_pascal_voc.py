@@ -251,7 +251,7 @@ if __name__ == '__main__':
                         default=False,
                         help='whether to limit loaded images resolutions')
     parser.add_argument('--omit-utility-poles', dest='omit_utility_poles', type=bool,
-                        default=True,
+                        default=False,
                         help='whether to remove utility poles annotations')
     parser.add_argument('--max-resolution', dest='max_resolution', type=int,
                         default=1000,

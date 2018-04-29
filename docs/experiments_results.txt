@@ -51,3 +51,15 @@ AP for small vehicle = 0.7906
 AP for solar panel = 0.1700
 Mean AP = 0.4316
 ~~~~~~~~
+7.
+Anchor scales [1, 2, 4, 8, 16] and anchor size = 16.
+Trained on 4 classes: small, large, solar panel and pole.
+All images.
+No crop.
+15 epochs.
+Scale = 1600
+AP for large vehicle = 0.5416
+AP for small vehicle = 0.9049
+AP for solar panel = 0.4545
+AP for utility pole = 0.2363
+Mean AP = 0.5343

@@ -34,7 +34,7 @@ class ddrnd(imdb):
         self._data_path = os.path.join(self._devkit_path, 'VOC' + self._year)
         self._classes = ('__background__',  # always index 0
                          'large vehicle', 'small vehicle',
-                         'solar panel')
+                         'solar panel', 'utility pole')
         self._class_to_ind = dict(zip(self.classes, xrange(self.num_classes)))
         self._image_ext = ['.jpg', '.tif', '.tiff']
         self._image_index = self._load_image_set_index()

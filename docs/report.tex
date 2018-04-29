@@ -33,7 +33,10 @@ The coarse grained classes are Small Vehicle, Large Vehicle, Solar Panel and Uti
 In the detection of Subclass and Colors classes, each detection should include a single value, while the Features detection has to include multiple values (has sunroof? has luggage carrier? etc).
 
 \section{Evaluation}
-Tell about eval methods...
+The final score will be a multiplication of the Coarse Grained classes detection score and the Fine Grained classes classification score.
+
+\subsection{Coarse Grained Score}
+Here we use the popular Mean Average Precision score. First, we have to define TP and FP of a bounding box prediction. TP will be defined by the IoU (intersection area over union area) score. If the IoU between observed Bouding Box and predicted Bounding Box is larger than 0.25, we mark this detection as TP. For Utility Poles which are labeled by 1 point, if the distance between observed and predicted point is less than 30 pixels, we consider the detection as TP as well. Otherwise, a detection is marked as FP. For multiple detections, only the first detection is considered TP. The rest will be considered FP.
 
 \section{The Dataset}
 \subsection{Brief}
@@ -99,6 +102,9 @@ I chose to randomly select 90\% of the dataset as training set and the rest 10\%
 A small percentage of validation set could impose a set which does not distribute as the training set, resulting in worse results in test time.\\
 However, I've still decided to stick with this split since there is no much data and due to the fact that I'm going to train on the full dataset anyway before submitting results (in order to slightly increase the accuracies).
 
+\section{SOTA Object Recognition Networks}
+...
+
 \section{Challenges}
 1. Oriented Bounding Box \\
 The dataset consisted of Oriented Bounding Boxes (Bounding Boxes which are not axis aligned). \\
@@ -119,8 +125,6 @@ Some image annotations contained bounding boxes with coordiantes outside of the 
 The objects appeared in the images are much smaller than standard objects networks usually try to detect. Therefore, the Region Proposal Network missed all the objects. I had to fine-tune some RPN related hyper-parameters in order to be able to detect the small objects in the dataset. The most important parameter was to set anchor scales to [1, 2, 4, 8, 16], which helped covering various objects size.
 6. High resolution images\\
 About 100 images in the dataset has various resolutions reaching up to 4k. Including those images in the dataset 
-\section{State Of The Art Object Recognition Networks}
-...
 
 \section{Experiments Results}
 I mostly used default learning-related hyper parameters in the following experiments, and fine-tuned the hyper parameters which would help the network to better learn the small sized objects of the dataset. There are more than 30 hyper parameters, so I'll mention the most important ones, and of course each experiment will describe the hyper parameters tuned for the experiment.\\

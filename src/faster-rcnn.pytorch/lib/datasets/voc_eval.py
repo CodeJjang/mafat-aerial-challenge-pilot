@@ -169,32 +169,50 @@ def voc_eval(detpath,
       BBGT = R['bbox'].astype(float)
 
       if BBGT.size > 0:
-        # compute overlaps
-        # intersection
-        ixmin = np.maximum(BBGT[:, 0], bb[0])
-        iymin = np.maximum(BBGT[:, 1], bb[1])
-        ixmax = np.minimum(BBGT[:, 2], bb[2])
-        iymax = np.minimum(BBGT[:, 3], bb[3])
-        iw = np.maximum(ixmax - ixmin + 1., 0.)
-        ih = np.maximum(iymax - iymin + 1., 0.)
-        inters = iw * ih
+        if classname == 'utility pole':
+          GT_PT = BBGT[:, 0:2]-np.array((0,1))
+          BB_PT = bb[0:2]-np.array((0,1))
+          dists = []
+          for i in range(len(GT_PT)):
+            dists.append(np.linalg.norm(GT_PT[i]-BB_PT))
+          dists = np.asarray(dists)
+          filtered_dists = np.array(np.where(dists <= 30))
+          jmax = -1
+          if filtered_dists.size > 0:
+            jmax = np.min(filtered_dists)
+          if jmax > -1 and not R['difficult'][jmax]:
+            if not R['det'][jmax]:
+              tp[d] = 1.
+              R['det'][jmax] = 1
+            else:
+              fp[d] = 1.
+        else:
+          # compute overlaps
+          # intersection
+          ixmin = np.maximum(BBGT[:, 0], bb[0])
+          iymin = np.maximum(BBGT[:, 1], bb[1])
+          ixmax = np.minimum(BBGT[:, 2], bb[2])
+          iymax = np.minimum(BBGT[:, 3], bb[3])
+          iw = np.maximum(ixmax - ixmin + 1., 0.)
+          ih = np.maximum(iymax - iymin + 1., 0.)
+          inters = iw * ih
 
-        # union
-        uni = ((bb[2] - bb[0] + 1.) * (bb[3] - bb[1] + 1.) +
-               (BBGT[:, 2] - BBGT[:, 0] + 1.) *
-               (BBGT[:, 3] - BBGT[:, 1] + 1.) - inters)
+          # union
+          uni = ((bb[2] - bb[0] + 1.) * (bb[3] - bb[1] + 1.) +
+                 (BBGT[:, 2] - BBGT[:, 0] + 1.) *
+                 (BBGT[:, 3] - BBGT[:, 1] + 1.) - inters)
 
-        overlaps = inters / uni
-        ovmax = np.max(overlaps)
-        jmax = np.argmax(overlaps)
+          overlaps = inters / uni
+          ovmax = np.max(overlaps)
+          jmax = np.argmax(overlaps)
 
-      if ovmax > ovthresh:
-        if not R['difficult'][jmax]:
-          if not R['det'][jmax]:
-            tp[d] = 1.
-            R['det'][jmax] = 1
-          else:
-            fp[d] = 1.
+          if ovmax > ovthresh:
+            if not R['difficult'][jmax]:
+              if not R['det'][jmax]:
+                tp[d] = 1.
+                R['det'][jmax] = 1
+              else:
+                fp[d] = 1.
       else:
         fp[d] = 1.
 
