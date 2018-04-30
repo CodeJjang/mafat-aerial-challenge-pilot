@@ -36,7 +36,18 @@ In the detection of Subclass and Colors classes, each detection should include a
 The final score will be a multiplication of the Coarse Grained classes detection score and the Fine Grained classes classification score.
 
 \subsection{Coarse Grained Score}
-Here we use the popular Mean Average Precision score. First, we have to define TP and FP of a bounding box prediction. TP will be defined by the IoU (intersection area over union area) score. If the IoU between observed Bouding Box and predicted Bounding Box is larger than 0.25, we mark this detection as TP. For Utility Poles which are labeled by 1 point, if the distance between observed and predicted point is less than 30 pixels, we consider the detection as TP as well. Otherwise, a detection is marked as FP. For multiple detections, only the first detection is considered TP. The rest will be considered FP.
+Here we use the popular Mean Average Precision score. First, we have to define TP and FP of a bounding box prediction. TP will be defined by the IoU (intersection area over union area) score. If the IoU between observed Bouding Box and predicted Bounding Box is larger than 0.25, we mark this detection as TP. For Utility Poles which are labeled by 1 point, if the distance between observed and predicted point is less than 30 pixels, we consider the detection as TP as well. Otherwise, a detection is marked as FP. For multiple detections, only the first detection is considered TP. The rest will be considered FP. Now, we can calculate AP:\\
+$$AP(class)=\frac{1}{K}\sum_{k=1}^{K}precision(k)rel(k)$$
+$$mAP=\frac{1}{N_c}\sum_{class=1}^{N_c}AP(class)$$
+Where $K$ is the total number of objects from the class in the test data, $precision(k)$ is the precision calculated over the first k objects, $rel(k)$ is 1 if object k is true, else 0 and $N_c$ is the number of categories.
+
+\subsection{Fine Grained Score}
+Calculated only for Coarse Grained classes that were predicted correctly. We'll calculate the score using Cohen's Kappa. The Kappa score is calculated separately for the subclass, the color and each feature of the main category. Then, the category score is an average of the Kappa of each feature. Finally, the Fine Grained score is a weighted average between the score of the small vehicles and the large vehicles.
+$$score_{small}=\frac{1}{M_{small}}\sum_{i}^{M_{small}}k_i$$
+$$score_{large}=\frac{1}{M_{large}}\sum_{i}^{M_{large}}k_i$$
+Where $k_i$ is Cohen's Kappa for each feature i, $M_{small}$ is the number of features of the small vehicles, and $M_{large}$ is the number of features of the large vehicles (including the subclass and color).
+Then, the total Fined Grained score is:
+$$score=\frac{N_{large}score_{large}+N_{small}score_{small}}{N_{large}+N_{small}}$$
 
 \section{The Dataset}
 \subsection{Brief}
@@ -53,6 +64,8 @@ The dataset contains thousands of aerial images, taken from diverse geographical
 \centering
 \includegraphics[width=1\linewidth]{"images/im3"}
 \end{figure}
+
+\clearpage
 \subsection{Analyses}
 Most of the dataset does not contain objects at all. Only 51 images are fully tagged. 2161 images are partially tagged, 7121 images were verified to contain no objects at all, and 36 images are untagged.\\
 Regarding labels, the dataset definitely biases towards small vehicles, which appear more than the other classes, combined. Distribution can be seen in Figure 1.
@@ -103,7 +116,7 @@ A small percentage of validation set could impose a set which does not distribut
 However, I've still decided to stick with this split since there is no much data and due to the fact that I'm going to train on the full dataset anyway before submitting results (in order to slightly increase the accuracies).
 
 \section{SOTA Object Recognition Networks}
-...
+Explain about SSD, YoLo, Faster RCNN, and why I chose to use Faster RCNN.
 
 \section{Challenges}
 1. Oriented Bounding Box \\
@@ -113,7 +126,7 @@ Therefore, I had to wrap each OBB in HBB.
 OBB should be easier to learn because they are less strict than HBB, but due to their nature the expected score would be smaller than OBB, which better wraps the objects.
 \\\\
 2. Classes with a point instead of Bounding Box\\
-The utility pole class objects are marked with a point instead of 4 points Bounding Box. Therefore, for the beginning I've decided to remove all the utility poles objects from the dataset (and also images which contained only utility poles, 533 in total), as they are extremely difficult to detect and posed several problems in the training.
+The utility pole class objects are marked with a point instead of 4 points Bounding Box. Therefore, for the beginning I've decided to remove all the utility poles objects from the dataset (and also images which contained only utility poles, 533 in total), as they are extremely difficult to detect and posed several problems in the training. Later, I added them but extended the point to a 1x1 bounding box, with partial success in detection accuracies.
 \\\\
 3. Subclasses\\
 I decided to ignore the fine-grained classification for now, since most of the detection networks modules do not support them.
@@ -122,9 +135,10 @@ I decided to ignore the fine-grained classification for now, since most of the d
 Some image annotations contained bounding boxes with coordiantes outside of the image. I decided to crop these coordinates to fit inside image.
 \\\\
 5. Small objects\\
-The objects appeared in the images are much smaller than standard objects networks usually try to detect. Therefore, the Region Proposal Network missed all the objects. I had to fine-tune some RPN related hyper-parameters in order to be able to detect the small objects in the dataset. The most important parameter was to set anchor scales to [1, 2, 4, 8, 16], which helped covering various objects size.
+The objects appeared in the images are much smaller than standard objects networks usually try to detect. Therefore, the Region Proposal Network missed all the objects. I had to fine-tune some RPN related hyper-parameters in order to be able to detect the small objects in the dataset. The most important parameter was to set anchor scales to [1, 2, 4, 8, 16], which helped covering various objects sizes.
+\\\\
 6. High resolution images\\
-About 100 images in the dataset has various resolutions reaching up to 4k. Including those images in the dataset 
+About 100 images in the dataset have relatively high resolutions reaching up to 4k. Including those images in the dataset requires scaling them down, since they won't fit into GPU. However, it seems that the scaling process reduces detection accuracies of classes, compared to a training done only on the standard (1000x600) resolution images. The problem can probably be solved by either increasing GPU memory or cropping the high resolution images and applying NMS in order to properly filter detection duplications.
 
 \section{Experiments Results}
 I mostly used default learning-related hyper parameters in the following experiments, and fine-tuned the hyper parameters which would help the network to better learn the small sized objects of the dataset. There are more than 30 hyper parameters, so I'll mention the most important ones, and of course each experiment will describe the hyper parameters tuned for the experiment.\\
@@ -166,5 +180,15 @@ Large Vehicle AP = 0.3340\\
 Small Vehicle AP = 0.7906\\
 Solar Panel AP = 0.1700\\
 mAP = 0.4316
+
+\subsection{Experiment 5}
+I've returned to Experiment 3 parameters, and added the Utility Pole class to the training, but generating a 1x1 Bounding Box for each Utility Pole point.
+Results:\\
+Large Vehicle AP = 0.5416\\
+Small Vehicle AP = 0.9049\\
+Solar Panel AP = 0.4545\\
+Utility Pole AP = 0.2363\\
+mAP = 0.5343
+
 
 \end{document}
