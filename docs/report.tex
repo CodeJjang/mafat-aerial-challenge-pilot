@@ -129,7 +129,11 @@ OBB should be easier to learn because they are less strict than HBB, but due to 
 The utility pole class objects are marked with a point instead of 4 points Bounding Box. Therefore, for the beginning I've decided to remove all the utility poles objects from the dataset (and also images which contained only utility poles, 533 in total), as they are extremely difficult to detect and posed several problems in the training. Later, I added them but extended the point to a 1x1 bounding box, with partial success in detection accuracies.
 \\\\
 3. Subclasses\\
-I decided to ignore the fine-grained classification for now, since most of the detection networks modules do not support them.
+I decided to integrate more Fully Connected layers on top of the Faster-RCNN which would learn each of the fine-grained features, starting from the color feature.
+Trying to integrate the subclasses in the original Faster-RCNN network were difficult, and were accompanied by weeks of debugging the network and trying to figure why it doesn't learn the fine-grained features, or worse, why does it badly ruin the accuracy of other coarse-grained classes.\\
+I had to solve many size mismatch bugs, re-compile some Cuda modules which contained hard-coded tensor sizes, etc.
+I have documented the results of those trials but did not add them to my experiments list as they were really bad. All the accuracies were less than 0.1.\\
+I realized that perhaps the network doesn't learn the fine-grained features along with the coarse-grained ones because in order to learn a good representation for the coarse-grained classes, it omits many details (such as color) for this task. To prove this, I trained a separate ResNet-50 for the color fine-grained feature, which yielded good results supporting my assumption. I hereby decided to take this route and train the ResNet for several more fine-grained features.
 \\\\
 4. Falsely annotated images\\
 Some image annotations contained bounding boxes with coordiantes outside of the image. I decided to crop these coordinates to fit inside image.
@@ -190,5 +194,25 @@ Solar Panel AP = 0.4545\\
 Utility Pole AP = 0.2363\\
 mAP = 0.5343
 
+\subsection{Experiment 6}
+I now trained a ResNet-50 network for classifying the color fine-grained feature of Small and Large Vehicles.\\
+For this task I cropped all tagged Small and Large Vehicles and fed them to the network for classification of the color.\\
+I fully trained (i.e. did not use pretrained network) the ResNet-50 for 90 epochs and received a 75.836\% precision on this feature.
 
+\subsection{Experiment 7}
+I now wanted to check whether using a pretrained ResNet-50 would encourage transfer-learning and help to improve the classification accuracy.
+Again, I trained the pretrained ResNet-50 for 90 epochs.
+I managed to improve the accuracy up to 79.348\%.
+
+\subsection{Experiment 8}
+Now I trained (from scratch) a ResNet-50 network for classifying the subclass fine-grained feature of Small Vehicles only (which differs from Large Vehicle subclasses).
+The network was trained for 90 epochs and received a disappointing 51.399\% precision on this feature.
+
+\subsection{Experiment 9}
+I now repeated the exact previous experiment but with a pretrained ResNet-50.\\
+Just like in the previous experiments the pretrained network beat the other fully trained network, but with a small gap. The network here reached 52.710\% precision on this feature.
+
+\section{Experiments Conclusions}
+
+\section{References}
 \end{document}
