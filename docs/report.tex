@@ -48,6 +48,8 @@ $$score_{large}=\frac{1}{M_{large}}\sum_{i}^{M_{large}}k_i$$
 Where $k_i$ is Cohen's Kappa for each feature i, $M_{small}$ is the number of features of the small vehicles, and $M_{large}$ is the number of features of the large vehicles (including the subclass and color).
 Then, the total Fined Grained score is:
 $$score=\frac{N_{large}score_{large}+N_{small}score_{small}}{N_{large}+N_{small}}$$
+\\\\
+As I did not have time to tclassify all the Fine Grained features, I decided to evaluate my results (of the several classes I did classify) with a normal accuracy evaluation.
 
 \section{The Dataset}
 \subsection{Brief}
@@ -100,8 +102,6 @@ and also with color tags, as seen in Figure 4.
 \\
 On average, there are 8 objects in an image, while the most crowded image contains 164 objects altogether.\\
 
-<Complete chart regarding objects frequency per image, make bins and then calculate frequencies>\\
-
 In Figure 5 we can see just how small are our objects, and what is their frequency in terms of square rooted area. The large vehicle objects spans roughly on all the size range, with more appearances around sizes 40-100. Small vehicle objects, however, mostly appear in sizes 20-70. Lastly, our solar panel objects are relatively very small, ranging around sizes 10-40.
 \begin{figure}[!h]
 \centering
@@ -115,8 +115,12 @@ I chose to randomly select 90\% of the dataset as training set and the rest 10\%
 A small percentage of validation set could impose a set which does not distribute as the training set, resulting in worse results in test time.\\
 However, I've still decided to stick with this split since there is no much data and due to the fact that I'm going to train on the full dataset anyway before submitting results (in order to slightly increase the accuracies).
 
-\section{SOTA Object Recognition Networks}
-Explain about SSD, YoLo, Faster RCNN, and why I chose to use Faster RCNN.
+\section{Chosen Networks}
+Following the DOTA paper in which Faster-RCNN achieved best scores on the detection task with aerial dataset, I decided to use it on my aerial dataset as well.\\
+For classification of fine-grained features I used ResNet-50, which should give a good trade-off between speed and accuracy and is a well known network for image classification.
+
+\subsection{Faster-RCNN}
+
 
 \section{Challenges}
 1. Oriented Bounding Box \\
@@ -200,8 +204,8 @@ For this task I cropped all tagged Small and Large Vehicles and fed them to the 
 I fully trained (i.e. did not use pretrained network) the ResNet-50 for 90 epochs and received a 75.836\% precision on this feature.
 
 \subsection{Experiment 7}
-I now wanted to check whether using a pretrained ResNet-50 would encourage transfer-learning and help to improve the classification accuracy.
-Again, I trained the pretrained ResNet-50 for 90 epochs.
+I now wanted to check whether fine-tuning a pretrained ResNet-50 would encourage transfer-learning and help to improve the classification accuracy.
+Again, I run the model 90 epochs.
 I managed to improve the accuracy up to 79.348\%.
 
 \subsection{Experiment 8}
@@ -210,9 +214,17 @@ The network was trained for 90 epochs and received a disappointing 51.399\% prec
 
 \subsection{Experiment 9}
 I now repeated the exact previous experiment but with a pretrained ResNet-50.\\
-Just like in the previous experiments the pretrained network beat the other fully trained network, but with a small gap. The network here reached 52.710\% precision on this feature.
+Just like in the previous experiments the pretrained network beat the other fully trained network, but with a small gap. The network reached 52.710\% precision on this feature.
+
+\subsection{Experiment 10}
+This time I fine-tuned a pretrained ResNet-50 on the Large Vehicle fine-grained Subclass feature. Surprisingly, the model reached accuracy of 45.283\%, despite having a relatively small (~500) train examples.
 
 \section{Experiments Conclusions}
+
+\section{Further Work}
+I did not have time to properly incorporate some 50 high resolution images to the training, as they did not fit into GPU. The problem can be solved by cropping each image and using Non Maximum Suppression to omit overlapping predictions from the calculations. I decided to down-scale them so they would fit for GPU which can possibly hurt the potential for the network to fully learn from them.
+\\
+I also did not have enough time to train the ResNet-50 network on all the fine-grained features and calculate a cumulative score for the fine-grained task which takes into account all the Cohen Kappas' scores of all the features.
 
 \section{References}
 \end{document}
