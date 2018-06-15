@@ -1,0 +1,7 @@
+1. Normalize dataset (check if I also need to normalize to original pascal voc)
+
+normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+more info here:
+https://pytorch.org/docs/master/torchvision/models.html
+
+2. Try caffe pretrained resnet (they say it has more 2% precision)
