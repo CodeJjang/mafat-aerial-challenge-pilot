@@ -220,8 +220,14 @@ Just like in the previous experiments the pretrained network beat the other full
 This time I fine-tuned a pretrained ResNet-50 on the Large Vehicle fine-grained Subclass feature. Surprisingly, the model reached accuracy of 45.283\%, despite having a relatively small ($\approx$500) train examples.
 
 \section{Experiments Conclusions}
+\subsection{Coarse grained classes}
+The F-RCNN \cite{fasterrcnn} network have successfully learned to detect the Small Vehicle class with Average Precision of 0.90\%. It also succeed to detect Large Vehicle class with 0.75\% AP in the first experiment despite having only hundreds of samples of it. The accuracy decreased to 0.54\% when more classes and high resolution images were added. The decrease in the results can be explained in several ways. First, the network may have confused the Large Vehicle with other classes, such as Solar Panel. Second, it is reasonable that the down scaling process of the high resolution images added even smaller and perhaps skewed objects, which were difficult for the network to correctly detect and classify. This actually affects all the results altogether.\\
+The network detected Solar Panel class with 0.45\% AP, which is in average almost as the size of the Small Cars, but appears fifth times less than them in the dataset. Utility Pole class was detected with 0.23\% AP, despite it's small size, probably because it had around 6000 tagged instances in the dataset.
 
-It is reasonable that the down scaling process caused less optimized detection results, since objects become even smaller and perhaps skewed. 
+\subsection{Fine grained classes}
+In all the experiments fine-tuning the ResNet-50 \cite{resnet} yielded better results than training it from scratch.
+The network successfully classified the Color feature with 79.34\% (Large and Small Vehicles combined), the Subclass feature of Small Vehicles with 52.71\% and the Subclass feature of Large Vehicles with 45.28\%. The difference between the pretrained and fully trained networks can probably be explained due to the relatively small object instances fed to the network. The ImageNet \cite{imagenet} dataset, on which the pretrained network is trained on, consists of 14 million images, in contrast with several thousands we got here. \\
+The difference between the Color and Subclass accuracies can also be explained due to the difficulty of learning characteristics and nuances between different cars subclasses, unlike learning colors, which usually fill most of the image.
 
 \section{Further Work}
 I did not have time to properly incorporate some $\approx$100 high resolution images to the training, as they did not fit into GPU memory. 
