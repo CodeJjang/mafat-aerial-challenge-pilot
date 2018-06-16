@@ -125,28 +125,28 @@ For classification of fine-grained features I used an ImageNet \cite{imagenet} p
 \section{Challenges}
 1. Oriented Bounding Box \\
 The dataset consisted of Oriented Bounding Boxes (Bounding Boxes which are not axis aligned). \\
-The popular dataset formats (MSCOCO, PASCAL VOC, etc) however supports axis aligned Bounding Boxes only, called Horizontal Bounding Boxes. 
-Therefore, I had to wrap each OBB in HBB.  
-OBB should be easier to learn because they are less strict than HBB, but due to their nature the expected score would be smaller than OBB, which better wraps the objects.
+The popular dataset formats however support axis aligned Bounding Boxes only, called Horizontal Bounding Boxes. 
+In addition, OBBs are more difficult to learn than HBBs since they are more strict. Hence I decided to wrap each OBB in an HBB, essentially making all Bounding Boxes axis aligned.  
 \\\\
-2. Classes with a point instead of Bounding Box\\
-The utility pole class objects are marked with a point instead of 4 points Bounding Box. Therefore, for the beginning I've decided to remove all the utility poles objects from the dataset (and also images which contained only utility poles, 533 in total), as they are extremely difficult to detect and posed several problems in the training. Later, I added them but extended the point to a 1x1 bounding box, with partial success in detection accuracies.
+2. Classes annotated with a single point\\
+The utility pole class objects are annotated with a single point instead of 4 points Bounding Box. Therefore, in the initial experiments I've decided to remove all the utility poles objects from the dataset (and also images which contained only utility poles, 533 in total), as they are extremely difficult to detect and posed several problems in the training. Later, I added them to the training data by extending each point to a 1x1 bounding box.
 \\\\
-3. Subclasses\\
-I decided to integrate more Fully Connected layers on top of the Faster-RCNN which would learn each of the fine-grained features, starting from the color feature.
-Trying to integrate the subclasses in the original Faster-RCNN network were difficult, and were accompanied by weeks of debugging the network and trying to figure why it doesn't learn the fine-grained features, or worse, why does it badly ruin the accuracy of other coarse-grained classes.\\
-I had to solve many size mismatch bugs, re-compile some Cuda modules which contained hard-coded tensor sizes, etc.
-I have documented the results of those trials but did not add them to my experiments list as they were really bad. All the accuracies were less than 0.1.\\
-I realized that perhaps the network doesn't learn the fine-grained features along with the coarse-grained ones because in order to learn a good representation for the coarse-grained classes, it omits many details (such as color) for this task. To prove this, I trained a separate ResNet-50 for the color fine-grained feature, which yielded good results supporting my assumption. I hereby decided to take this route and train the ResNet for several more fine-grained features.
+3. Fine Grained features\\
+Fine-grained features classification is not part of the standard detection ConvNets implementations, which usually classify only one set of classes.
+In order to allow the F-RCNN \cite{fasterrcnn} to learn fine-grained features, I decided to integrate several Feed Forward layers on top of the network which would learn each of the fine-grained features, starting from the color feature.
+Trying to integrate the additional layers in the original network implementation were difficult, and were accompanied by weeks of debugging the network and trying to figure why it doesn't learn the fine-grained features, or worse, why does it badly ruin the accuracy of other coarse-grained classes.\\
+I had to solve many size mismatch bugs, re-compile some Cuda low level modules which contained hard-coded tensor sizes, etc.
+I have documented the results of those trials but did not add them to my experiments list as they have yielded really low accuracies.\\
+I realized that perhaps the network doesn't learn the fine-grained features along with the coarse-grained ones because in order to learn a good representation for the coarse-grained classes, it omits many details (such as color) for this task. To prove this, I trained a separate ResNet-50 \cite{resnet} for the color fine-grained feature, which gave good results supporting my assumption. I hereby decided to take this route and train this network for several more fine-grained features.
 \\\\
 4. Falsely annotated images\\
-Some image annotations contained bounding boxes with coordiantes outside of the image. I decided to crop these coordinates to fit inside image.
+Some image annotations contained bounding boxes with coordiantes outside of the image boundaries. I decided to crop these coordinates to fit inside the images, which is better in my opinion than entirely remove them from the dataset.
 \\\\
 5. Small objects\\
-The objects appeared in the images are much smaller than standard objects networks usually try to detect. Therefore, the Region Proposal Network missed all the objects. I had to fine-tune some RPN related hyper-parameters in order to be able to detect the small objects in the dataset. The most important parameter was to set anchor scales to [1, 2, 4, 8, 16], which helped covering various objects sizes.
+The objects appeared in the images are much smaller than standard objects networks usually try to detect. Therefore, the Region Proposal Network of the F-RCNN \cite{fasterrcnn} missed all the objects. I had to fine-tune some RPN related hyper-parameters in order to be able to detect the small objects in the dataset. The most important parameter was to set anchor scales to [1, 2, 4, 8, 16], which helped covering various objects sizes.
 \\\\
 6. High resolution images\\
-About 100 images in the dataset have relatively high resolutions reaching up to 4k. Including those images in the dataset requires scaling them down, since they won't fit into GPU. However, it seems that the scaling process reduces detection accuracies of classes, compared to a training done only on the standard (1000x600) resolution images. The problem can probably be solved by either increasing GPU memory or cropping the high resolution images and applying NMS in order to properly filter detection duplications.
+About 100 images in the dataset have relatively high resolutions reaching up to 4k. Including those images in the dataset required scaling them down, since they wouldn't fit into GPU memory.
 
 \section{Experiments Results}
 I mostly used default learning-related hyper parameters in the following experiments, and fine-tuned the hyper parameters which would help the network to better learn the small sized objects of the dataset. There are more than 30 hyper parameters, so I'll mention the most important ones, and of course each experiment will describe the hyper parameters tuned for the experiment.\\
@@ -221,8 +221,11 @@ This time I fine-tuned a pretrained ResNet-50 on the Large Vehicle fine-grained 
 
 \section{Experiments Conclusions}
 
+It is reasonable that the down scaling process caused less optimized detection results, since objects become even smaller and perhaps skewed. 
+
 \section{Further Work}
-I did not have time to properly incorporate some $\approx$50 high resolution images to the training, as they did not fit into GPU. The problem can be solved by cropping each image and using Non Maximum Suppression to omit overlapping predictions from the calculations. I decided to down-scale them so they would fit for GPU which can possibly hurt the potential for the network to fully learn from them.
+I did not have time to properly incorporate some $\approx$100 high resolution images to the training, as they did not fit into GPU memory. 
+The problem can be solved by cropping each image and using Non Maximum Suppression algorithm to omit duplicated predictions from the calculations.
 \\
 I also did not have enough time to train the ResNet-50 network on all the fine-grained features and calculate a cumulative score for the fine-grained task which takes into account all the Cohen Kappas' scores of all the features, but only managed to proof the feasibility of this task by training on the Color and Subclass features.
 
