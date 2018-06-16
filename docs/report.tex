@@ -148,9 +148,10 @@ The objects appeared in the images are much smaller than standard objects networ
 6. High resolution images\\
 About 100 images in the dataset have relatively high resolutions reaching up to 4k. Including those images in the dataset required scaling them down, since they wouldn't fit into GPU memory.
 
-\section{Experiments Results}
+\section{Experiments}
 I mostly used default learning-related hyper parameters in the following experiments, and fine-tuned the hyper parameters which would help the network to better learn the small sized objects of the dataset. There are more than 30 hyper parameters, so I'll mention the most important ones, and of course each experiment will describe the hyper parameters tuned for the experiment.\\
-Learning rate was 0.001, optimizer was SGD with 0.9 momentum, weight decay was 5e-4, epochs number was 15, RPN anchor ratios were [0.5,1,2] and RPN feature stride was 16.
+For the F-RCNN \cite{fasterrcnn}, learning rate was 0.001, optimizer was SGD with 0.9 momentum, weight decay was 5e-4, epochs number was 15, RPN anchor ratios were [0.5,1,2] and RPN feature stride was 16.\\
+As for the ResNet-50 \cite{resnet}, batch size was 256, learning rate 0.1, momentum was 0.9 and weight decay was 1e-4. The network were trained for 90 epochs. None of those parameters were changed in the experiments.
 \\\\
 The initial experiments results (before I found the baseline hyper paremeters setup) are omitted, because the network didn't even train. For the same reason, experiments which contained bugs (due to the error and trial nature of the process) are also not metioned.
 \\\\
@@ -199,13 +200,12 @@ Utility Pole AP = 0.2363\\
 mAP = 0.5343
 
 \subsection{Experiment 6}
-I now trained a ResNet-50 network for classifying the color fine-grained feature of Small and Large Vehicles.\\
+I now trained a ResNet-50 \cite{resnet} network from scratch for classifying the color fine-grained feature of Small and Large Vehicles.\\
 For this task I cropped all tagged Small and Large Vehicles and fed them to the network for classification of the color.\\
-I fully trained (i.e. did not use pretrained network) the ResNet-50 for 90 epochs, batch size was 256, learning rate 0.1, momentum of 0.9 and a weight decay of 1e-4 (those params were not changed during the following experiments).\\
 I received a 75.836\% precision on this feature.
 
 \subsection{Experiment 7}
-I now wanted to check whether fine-tuning a pretrained ResNet-50 would encourage transfer-learning and help to improve the classification accuracy.
+I now wanted to check whether fine-tuning a pretrained ResNet-50 \cite{resnet} would encourage transfer-learning and help to improve the classification accuracy.
 I managed to improve the accuracy up to 79.348\%.
 
 \subsection{Experiment 8}
