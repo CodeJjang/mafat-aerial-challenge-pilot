@@ -5,11 +5,17 @@
 \title{Mafat (DDR\&D) Challenge\\
 	Detection and fine grained classification of objects in aerial imagery
 	}
-\author{Aviad Moreshet\\204311112}
+\author{Aviad Moreshet\\Bar Ilan University}
 
 \begin{document}
-\date{}
+\date{June 21, 2018}
 \maketitle
+\begin{abstract}
+Object detection is an important and challenging problem in computer vision field. Despite the major advances in detection of objects in natural scenes, not much work has been done on aerial imagery scenes. Those scenes are characterized by a unique bird's eye view, tilted orientation, may contain up to dozens or hundreds of objects with a relatively small objects, etc.
+In this paper I tried to solve Mafat Challenge of Detection and fine-grained classification of objects in aerial imagery, by training and fine-tuning several ConvNets architectures on the published dataset.
+
+\end{abstract}
+
 
 
 \section{The Task}
@@ -42,18 +48,12 @@ $$mAP=\frac{1}{N_c}\sum_{class=1}^{N_c}AP(class)$$
 Where $K$ is the total number of objects from the class in the test data, $precision(k)$ is the precision calculated over the first k objects, $rel(k)$ is 1 if object k is true, else 0 and $N_c$ is the number of categories.
 
 \subsection{Fine Grained Score}
-Calculated only for Coarse Grained classes that were predicted correctly. We'll calculate the score using Cohen's Kappa. The Kappa score is calculated separately for the subclass, the color and each feature of the main category. Then, the category score is an average of the Kappa of each feature. Finally, the Fine Grained score is a weighted average between the score of the small vehicles and the large vehicles.
-$$score_{small}=\frac{1}{M_{small}}\sum_{i}^{M_{small}}k_i$$
-$$score_{large}=\frac{1}{M_{large}}\sum_{i}^{M_{large}}k_i$$
-Where $k_i$ is Cohen's Kappa for each feature i, $M_{small}$ is the number of features of the small vehicles, and $M_{large}$ is the number of features of the large vehicles (including the subclass and color).
-Then, the total Fined Grained score is:
-$$score=\frac{N_{large}score_{large}+N_{small}score_{small}}{N_{large}+N_{small}}$$
-\\\\
-As I did not have time to tclassify all the Fine Grained features, I decided to evaluate my results (of the several classes I did classify) with a normal accuracy evaluation.
+Calculated only for Coarse Grained classes that were predicted correctly.
+The challenge suggested to calculate the score using Cohen's Kappa score, however, due to lack of time to classify all the Fine Grained features, I decided to evaluate my results (of the several classes I did classify) with a normal accuracy (precision) evaluation.
 
 \section{The Dataset}
 \subsection{Brief}
-The dataset contains thousands of aerial images, taken from diverse geographical locations, different times, resolutions, area coverage and photo conditions (weather, angles and lighting). The resolutions vary between 5cm to 15cm Ground Sample Distance (the distance between pixel centers measured on the ground). Some samples:\\
+The dataset contains thousands of aerial images, taken from diverse geographical locations, different times, resolutions, area coverage and photo conditions (weather, angles and lighting). The resolutions vary between 5cm to 15cm Ground Sample Distance (the distance between pixel centers measured on the ground). Some samples (generated with VoTT \cite{vott}):\\
 \begin{figure}[!h]
 \centering
 \includegraphics[width=1\linewidth]{"images/im1"}
@@ -68,7 +68,7 @@ The dataset contains thousands of aerial images, taken from diverse geographical
 \end{figure}
 
 \clearpage
-\subsection{Analyses}
+\subsection{Analysis}
 Most of the dataset does not contain objects at all. Only 51 images are fully tagged. 2161 images are partially tagged, 7121 images were verified to contain no objects at all, and 36 images are untagged.\\
 Regarding labels, the dataset definitely biases towards small vehicles, which appear more than the other classes, combined. Distribution can be seen in Figure 1.
 \begin{figure}[!h]
@@ -115,17 +115,17 @@ I chose to randomly select 90\% of the dataset as training set and the rest 10\%
 A small percentage of validation set could impose a set which does not distribute as the training set, resulting in worse results in test time.\\
 However, I've still decided to stick with this split since there is no much data and due to the fact that I'm going to train on the full dataset anyway before submitting results (in order to slightly increase the accuracies).
 
-\section{Chosen Networks}
-Following the DOTA paper in which Faster-RCNN achieved best scores on the detection task with aerial dataset, I decided to use it on my aerial dataset as well.\\
-For classification of fine-grained features I used ResNet-50, which should give a good trade-off between speed and accuracy and is a well known network for image classification.
+\subsection{Dataset formats}
+I wrote a converter of the dataset into ImageNet \cite{imagenet} and Pascal VOC \cite{pascalvoc} formats in order to feed it to the neural networks which support only popular well-known formats.
 
-\subsection{Faster-RCNN}
-
+\section{Chosen Neural Networks}
+Following the DOTA paper \cite{dota} in which Faster-RCNN \cite{fasterrcnn} achieved best scores on the detection task on an aerial dataset, I decided to use it on my aerial dataset as well. The F-RCNN \cite{fasterrcnn} backbone network was an ImageNet \cite{imagenet} pretrained ResNet-101 \cite{resnet}. I used Jianwei Yang's implementation \cite{jianweiyang} of this architecture in PyTorch \cite{pytorch}.\\
+For classification of fine-grained features I used an ImageNet \cite{imagenet} pretrained ResNet-50 \cite{resnet}, which should give a good trade-off between speed and accuracy (ResNet-101 and ResNet-152 would give a little more accuracy but take longer time to train). I used the default PyTorch \cite{pytorch} implementation for this architecture.
 
 \section{Challenges}
 1. Oriented Bounding Box \\
 The dataset consisted of Oriented Bounding Boxes (Bounding Boxes which are not axis aligned). \\
-The popular dataset formats (COCO, PASCAL VOC, etc) however supports axis aligned Bounding Boxes only, called Horizontal Bounding Boxes. 
+The popular dataset formats (MSCOCO, PASCAL VOC, etc) however supports axis aligned Bounding Boxes only, called Horizontal Bounding Boxes. 
 Therefore, I had to wrap each OBB in HBB.  
 OBB should be easier to learn because they are less strict than HBB, but due to their nature the expected score would be smaller than OBB, which better wraps the objects.
 \\\\
@@ -201,16 +201,16 @@ mAP = 0.5343
 \subsection{Experiment 6}
 I now trained a ResNet-50 network for classifying the color fine-grained feature of Small and Large Vehicles.\\
 For this task I cropped all tagged Small and Large Vehicles and fed them to the network for classification of the color.\\
-I fully trained (i.e. did not use pretrained network) the ResNet-50 for 90 epochs and received a 75.836\% precision on this feature.
+I fully trained (i.e. did not use pretrained network) the ResNet-50 for 90 epochs, batch size was 256, learning rate 0.1, momentum of 0.9 and a weight decay of 1e-4 (those params were not changed during the following experiments).\\
+I received a 75.836\% precision on this feature.
 
 \subsection{Experiment 7}
 I now wanted to check whether fine-tuning a pretrained ResNet-50 would encourage transfer-learning and help to improve the classification accuracy.
-Again, I run the model 90 epochs.
 I managed to improve the accuracy up to 79.348\%.
 
 \subsection{Experiment 8}
-Now I trained (from scratch) a ResNet-50 network for classifying the subclass fine-grained feature of Small Vehicles only (which differs from Large Vehicle subclasses).
-The network was trained for 90 epochs and received a disappointing 51.399\% precision on this feature.
+Now I trained (from scratch) a ResNet-50 network for classifying the Subclass fine-grained feature of Small Vehicles only (which differs from Large Vehicle subclasses).
+The network however received a disappointing 51.399\% precision on this feature.
 
 \subsection{Experiment 9}
 I now repeated the exact previous experiment but with a pretrained ResNet-50.\\
@@ -226,5 +226,45 @@ I did not have time to properly incorporate some $\approx$50 high resolution ima
 \\
 I also did not have enough time to train the ResNet-50 network on all the fine-grained features and calculate a cumulative score for the fine-grained task which takes into account all the Cohen Kappas' scores of all the features, but only managed to proof the feasibility of this task by training on the Color and Subclass features.
 
-\section{References}
+\begin{thebibliography}{9}
+	\bibitem{vott} 
+	Visual Object Tagging Tool: An electron app for building end to end Object Detection Models from Images and Videos.
+	\\\texttt{https://github.com/Microsoft/VoTT}
+	
+	\bibitem{dota} 
+	Gui-Song Xia, Xiang Bai, Jian Ding, Zhen Zhu, Serge Belongie, Jiebo Luo, Mihai Datcu, Marcello Pelillo, Liangpei Zhang.
+	\textit{DOTA: A Large-scale Dataset for Object Detection in Aerial Images}. 
+	arXiv:1711.10398v2 [cs.CV], 2018.
+	
+	\bibitem{resnet} 
+	Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun.
+	\textit{Deep Residual Learning for Image Recognition}. 
+	10.1109/CVPR.2016.90, 2016.
+	
+	\bibitem{imagenet} 
+	 Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, Li Fei-Fei.
+	\textit{ImageNet: A large-scale hierarchical image database}. 
+	10.1109/CVPR.2009.5206848, 2009.
+	
+	\bibitem{pascalvoc} 
+	Mark Everingham, Luc Gool, Christopher K. Williams, John Winn, Andrew Zisserman.
+	\textit{The Pascal Visual Object Classes (VOC) Challenge}. 
+	10.1007/s11263-009-0275-4, 2010.
+	
+	\bibitem{fasterrcnn} 
+	S. Ren, K. He, R. B. Girshick, and J. Sun.
+	proposal networks.
+	\textit{Faster R-CNN: towards real-time object detection with region}. 
+	10.1109/TPAMI.2016.2577031, 2017.
+	
+	\bibitem{pytorch} 
+	PyTorch is a deep learning framework for fast, flexible experimentation.
+	\\\texttt{https://pytorch.org/}
+	
+	\bibitem{jianweiyang} 
+	Jianwei Yang's F-RCNN PyTorch implementation
+	\\\texttt{https://github.com/jwyang/faster-rcnn.pytorch}
+	
+\end{thebibliography}
+
 \end{document}
