@@ -217,14 +217,14 @@ I now repeated the exact previous experiment but with a pretrained ResNet-50.\\
 Just like in the previous experiments the pretrained network beat the other fully trained network, but with a small gap. The network reached 52.710\% precision on this feature.
 
 \subsection{Experiment 10}
-This time I fine-tuned a pretrained ResNet-50 on the Large Vehicle fine-grained Subclass feature. Surprisingly, the model reached accuracy of 45.283\%, despite having a relatively small (~500) train examples.
+This time I fine-tuned a pretrained ResNet-50 on the Large Vehicle fine-grained Subclass feature. Surprisingly, the model reached accuracy of 45.283\%, despite having a relatively small ($\approx$500) train examples.
 
 \section{Experiments Conclusions}
 
 \section{Further Work}
-I did not have time to properly incorporate some 50 high resolution images to the training, as they did not fit into GPU. The problem can be solved by cropping each image and using Non Maximum Suppression to omit overlapping predictions from the calculations. I decided to down-scale them so they would fit for GPU which can possibly hurt the potential for the network to fully learn from them.
+I did not have time to properly incorporate some $\approx$50 high resolution images to the training, as they did not fit into GPU. The problem can be solved by cropping each image and using Non Maximum Suppression to omit overlapping predictions from the calculations. I decided to down-scale them so they would fit for GPU which can possibly hurt the potential for the network to fully learn from them.
 \\
-I also did not have enough time to train the ResNet-50 network on all the fine-grained features and calculate a cumulative score for the fine-grained task which takes into account all the Cohen Kappas' scores of all the features.
+I also did not have enough time to train the ResNet-50 network on all the fine-grained features and calculate a cumulative score for the fine-grained task which takes into account all the Cohen Kappas' scores of all the features, but only managed to proof the feasibility of this task by training on the Color and Subclass features.
 
 \section{References}
 \end{document}
