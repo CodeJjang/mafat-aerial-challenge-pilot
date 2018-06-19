@@ -94,7 +94,7 @@ __C.TRAIN.BBOX_REG = True
 
 # Overlap required between a ROI and ground-truth box in order for that ROI to
 # be used as a bounding-box regression training example
-__C.TRAIN.BBOX_THRESH = 0.5
+__C.TRAIN.BBOX_THRESH = 0.25
 
 # Iterations between snapshots
 __C.TRAIN.SNAPSHOT_ITERS = 5000
@@ -128,9 +128,9 @@ __C.TRAIN.PROPOSAL_METHOD = 'gt'
 # Use RPN to detect objects
 __C.TRAIN.HAS_RPN = True
 # IOU >= thresh: positive example
-__C.TRAIN.RPN_POSITIVE_OVERLAP = 0.7
+__C.TRAIN.RPN_POSITIVE_OVERLAP = 0.25
 # IOU < thresh: negative example
-__C.TRAIN.RPN_NEGATIVE_OVERLAP = 0.3
+__C.TRAIN.RPN_NEGATIVE_OVERLAP = 0.25
 # If an anchor statisfied by positive and negative conditions set to negative
 __C.TRAIN.RPN_CLOBBER_POSITIVES = False
 # Max number of foreground examples
