@@ -50,7 +50,7 @@ Where $K$ is the total number of objects from the class in the test data, $preci
 
 \subsection{Fine Grained Score}
 Calculated only for Coarse Grained classes that were predicted correctly.
-The challenge suggested to calculate the score using Cohen's Kappa score, however, due to lack of time to classify all the fine grained features, I decided to evaluate my results (of the several classes I did classify) with a normal accuracy (precision) evaluation.
+The challenge suggested to calculate the score using Cohen's Kappa score, however, due to lack of time to classify all the fine grained features, I decided to evaluate my results (of the several classes I did classify) with a normal precision evaluation.
 
 \section{The Dataset}
 \subsection{Brief}
@@ -103,7 +103,7 @@ and also with color tags, as seen in Figure 4.
 \\
 On average, there are 8 objects in an image, while the most crowded image contains 164 objects altogether.\\
 
-In Figure 5 we can see just how small are our objects, and what is their frequency in terms of square rooted area. The large vehicle objects spans roughly on all the size range, with more appearances around sizes 40-100. Small vehicle objects, however, mostly appear in sizes 20-70. Lastly, our solar panel objects are relatively very small, ranging around sizes 10-40.
+In Figure 5 we can see just how small are our objects, and what is their frequency in terms of square rooted area of pixels. The large vehicle objects spans roughly on all the size range, with more appearances around sizes 40-100. Small vehicle objects, however, mostly appear in sizes 20-70. Lastly, our solar panel objects are relatively very small, ranging around sizes 10-40.
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.7\linewidth]{"charts/Dataset Objects Size Distribution"}
@@ -113,8 +113,7 @@ In Figure 5 we can see just how small are our objects, and what is their frequen
 
 \subsection{Dataset splits}
 I chose to randomly select 90\% of the dataset as training set and the rest 10\% as validation set. Test set should be supplied by the competition organizers.\\
-A small percentage of validation set could impose a set which does not distribute as the training set, resulting in worse results in test time.\\
-However, I've still decided to stick with this split since there is no much data and due to the fact that I'm going to train on the full dataset anyway before submitting results (in order to slightly increase the accuracies).
+
 
 \subsection{Dataset formats}
 I wrote a converter of the dataset into ImageNet \cite{imagenet} and Pascal VOC \cite{pascalvoc} formats in order to feed it to the neural networks which support only popular well-known formats.
@@ -134,29 +133,29 @@ The utility pole class objects are annotated with a single point instead of 4 po
 \\\\
 3. Fine Grained features\\
 Fine grained features classification is not part of the standard detection ConvNets implementations, which usually classify only one set of classes.
-In order to allow the F-RCNN \cite{fasterrcnn} to learn fine grained features, I decided to integrate several Feed Forward layers on top of the network which would learn each of the fine grained features, starting from the color feature.
-Trying to integrate the additional layers in the original network implementation was difficult and accompanied by weeks of debugging the network and trying to figure out why it doesn't learn the fine grained features, or worse, why does it badly ruin the accuracy of other coarse grained classes.\\
+In order to allow the F-RCNN \cite{fasterrcnn} to learn fine grained features, I decided to integrate several Fully Connected layers on top of the network which would learn each of the fine grained features, starting from the color feature.
+Trying to integrate the additional layers in the original network implementation was difficult and accompanied by weeks of debugging the network and trying to figure out why it doesn't learn the fine grained features, or worse, why does it badly ruin the scores of other coarse grained classes.\\
 I had to solve many size mismatch bugs, re-compile some CUDA low level modules which contained hard-coded tensor sizes, etc.
-I have documented the results of those trials but did not add them to my experiments list as they have yielded really low accuracies.\\
-I realized that perhaps the network doesn't learn the fine grained features along with the coarse grained ones because in order to learn a good representation (feature map) for the coarse grained classes, it omits many details (such as color) for this task. To prove this, I trained a separate ResNet-50 \cite{resnet} for the color fine grained feature, which gave good results supporting my assumption. I hereby decided to take this route and train this network for several more fine grained features.
+I have documented the results of those trials but did not add them to my experiments list as they have yielded really low scores.\\
+I realized that perhaps the network doesn't learn the fine grained features along with the coarse grained ones because in order to learn a good representation for the coarse grained classes, it omits many details (such as color) for this task. To prove this, I trained a separate ResNet-50 \cite{resnet} for the color fine grained feature, which gave good results supporting my assumption. I hereby decided to take this route and train this network for several more fine grained features.
 \\\\
 4. Falsely annotated images\\
-Some image annotations contained bounding boxes with coordiantes outside of the image boundaries. I decided to crop these coordinates to fit inside the images, which in my opinion better than entirely removing them from the dataset.
+Some image annotations contained bounding boxes with coordiantes outside of the image boundaries. I decided to crop these coordinates to fit inside the images, which in my opinion better than entirely removing them from the dataset, and might also even help, as a kind of regularization.
 \\\\
 5. Small objects\\
-The objects appeared in the images are much smaller than standard objects networks usually try to detect. Therefore, the Region Proposal Network of the F-RCNN \cite{fasterrcnn} missed all the objects. I had to fine-tune some RPN related hyper-parameters in order to be able to detect the small objects in the dataset. The most important parameter was to set anchor scales to [1, 2, 4, 8, 16], which helped covering various objects sizes.
+The objects appeared in the images are much smaller than standard objects networks usually try to detect. Therefore, the Region Proposal Network of the F-RCNN \cite{fasterrcnn} initially missed all the objects. I had to fine-tune some RPN related hyper-parameters in order to be able to detect the small objects in the dataset. The most important parameter was to set anchor scales to [1, 2, 4, 8, 16], which helped covering various objects sizes.
 \\\\
 6. High resolution images\\
-About 100 images in the dataset have relatively high resolutions reaching up to 4k. Including those images in the dataset required scaling them down, since they wouldn't fit into GPU memory.
+About 100 images in the dataset have relatively high resolutions reaching up to 4k. Including those images in the dataset incurred a big downscaling, since they wouldn't fit naturally into GPU memory. This big downscaling is later shown to hurt Large Vehicle AP.
 
 \section{Experiments}
 I mostly used default learning-related hyper parameters in the following experiments, and fine-tuned the hyper parameters which would help the network to better learn the small sized objects of the dataset. There are more than 30 hyper parameters, so I'll mention the most important ones, and of course each experiment will describe the hyper parameters tuned for the experiment.\\
-For the F-RCNN \cite{fasterrcnn}, learning rate was 0.001, optimizer was SGD with 0.9 momentum, weight decay was 5e-4, epochs number was 15, RPN anchor ratios were [0.5,1,2] and RPN feature stride was 16.\\
-As for the ResNet-50 \cite{resnet}, optimizer was also SGD, batch size was 256, learning rate 0.1, momentum was 0.9 and weight decay was 1e-4. The network were trained for 90 epochs. None of those parameters were changed in the experiments.
+For the F-RCNN \cite{fasterrcnn}, learning rate was 0.001, optimizer was SGD with 0.9 momentum, weight decay was 5e-4, epochs number was 15, RPN anchor ratios were [0.5,1,2] and RPN feature stride was 16. Basic augmentation of horizontal flip was applied. Learning rate scheduler policy was to divide learning rate by 10 every 5 epochs.\\
+As for the ResNet-50 \cite{resnet}, optimizer was also SGD, batch size was 256, learning rate 0.1, momentum was 0.9 and weight decay was 1e-4. The network was trained for 90 epochs. Augmentations used were of horizontal flip and random cropping. Learning rate scheduler policy was to divide learning rate by 10 every 30 epochs.
 \\\\
 The initial experiments results (before I found the baseline hyper paremeters setup) are omitted, because the network didn't even train. For the same reason, experiments which contained bugs (due to the error and trial nature of the process) are also omitted.
 \\\\
-In addition, I did not see reasons to collect training plots regarding loss and accuracies until I started optimizing them, since the first upcoming experiments have other targets, and the major challenge and time-consuming tasks of the project was to achieve results on this difficult unique dataset.
+In addition, I did not see reasons to collect training plots regarding loss and score metrics until I started optimizing them, since the first upcoming experiments have other targets, and the major challenge and time-consuming tasks of the project was to achieve results on this difficult unique dataset.
 
 \subsection{Experient 1}
 This is the first experiment which yielded actual results.\\
@@ -184,7 +183,7 @@ Solar Panel AP = 0.6431\\
 mAP = 0.6778
 
 \subsection{Experiment 4}
-I now wanted to test the combination the scale parameter values, thus, I set the scale size to be [600, 1600] (meaning each image would be scaled twice, by the two factors). All other parameters remained the same.\\
+I now wanted to test a combination the scale parameter values, thus, I set the scale size to be [600, 1600] (meaning each image is randomly scaled to either of those sizes). All other parameters remained the same.\\
 Results:\\
 Large Vehicle AP = 0.3340\\
 Small Vehicle AP = 0.7906\\
@@ -215,8 +214,8 @@ For this task I cropped all tagged Small and Large Vehicles and fed them to the 
 I received a 75.836\% precision on this feature.
 
 \subsection{Experiment 8}
-I now wanted to check whether fine-tuning a pretrained ResNet-50 \cite{resnet} would encourage transfer-learning and help to improve the classification accuracy.
-I managed to improve the accuracy up to 79.348\%.
+I now wanted to check whether fine-tuning a pretrained ResNet-50 \cite{resnet} would encourage transfer-learning and help to improve the classification precision.
+I managed to improve the precision up to 79.348\%.
 
 \subsection{Experiment 9}
 Now I trained (from scratch) a ResNet-50 network for classifying the Subclass fine grained feature of Small Vehicles only (which differs from Large Vehicle subclasses).
@@ -227,23 +226,29 @@ I now repeated the exact previous experiment but with a pretrained ResNet-50.\\
 Just like in the previous experiments the pretrained network beat the other fully trained network, but with a small gap. The network reached 52.710\% precision on this feature.
 
 \subsection{Experiment 11}
-This time I fine-tuned a pretrained ResNet-50 on the Large Vehicle fine grained Subclass feature. Surprisingly, the model reached accuracy of 45.283\%, despite having a relatively small ($\approx$500) train examples.
+This time I fine-tuned a pretrained ResNet-50 on the Large Vehicle fine grained Subclass feature. Surprisingly, the model reached a precision of 45.283\%, despite having a relatively small ($\approx$500) train examples.
 
 \section{Experiments Conclusions}
 \subsection{Coarse grained classes}
-The F-RCNN \cite{fasterrcnn} network have successfully learned to detect the Small Vehicle class with Average Precision of 0.91. It also succeed to detect Large Vehicle class with 0.75 AP in the first experiment despite having only hundreds of samples of it. The accuracy decreased to 0.54 (0.65 with the Challenge's IoU) when more classes and high resolution images were added. The decrease in the results can be explained in several ways. First, the network may have confused the Large Vehicle with other classes, such as Solar Panel. Second, it is reasonable that the down scaling process of the high resolution images added even smaller and perhaps skewed objects, which were difficult for the network to correctly detect and classify. This theory is supported by experiment 3, which shows that less down-scaling increases accuracies. This issue actually affects all the results altogether.\\
+The F-RCNN \cite{fasterrcnn} network have successfully learned to detect the Small Vehicle class with AP of 0.91. It also succeed to detect Large Vehicle class with 0.75 AP in the first experiment despite having only hundreds of samples of it. The AP decreased to 0.54 (0.65 with the Challenge's IoU) when more classes and high resolution images were added. The decrease in the results can be explained in several ways. First, the network may have confused the Large Vehicle with other classes, such as Solar Panel. Second, it is reasonable that the down scaling process of the high resolution images added even smaller and perhaps skewed objects, which were difficult for the network to correctly detect and classify. This theory is supported by experiment 3, which shows that less downscaling increases AP. This issue actually affects all the results altogether.\\
 The network detected Solar Panel class with 0.63 AP. The Solar Panel class average size is as almost as the size of the Small Cars, but appears fifth times less in the dataset. Utility Pole class was detected with 0.27 AP, despite it's small size, probably because it had around 6000 tagged instances in the dataset.\\
-Another aspect to touch is transfer learning. We can conclude that despite the fact that the network ResNet \cite{resnet} backbone is trained on ImageNet \cite{imagenet}, which contains images in different angles, perspectives and views, the network manages to achieve significant results on the relatively small dataset here.
+Another aspect to touch is transfer learning. We can conclude that despite the fact that the network's ResNet \cite{resnet} backbone is trained on ImageNet \cite{imagenet}, which contains images in different angles, perspectives and views, the network manages to achieve significant results on the relatively small dataset here, thus effectively performing transfer learning.
 
 \subsection{Fine grained classes}
 In all the experiments fine-tuning the ResNet-50 \cite{resnet} yielded better results than training it from scratch, which indicates a useful transfer learning.
-The network successfully classified the Color feature with 79.34\% (Large and Small Vehicles combined), the Subclass feature of Small Vehicles with 52.71\% and the Subclass feature of Large Vehicles with 45.28\%. The difference between the pretrained and fully trained networks can probably be explained due to the relatively small object instances fed to the network. The ImageNet \cite{imagenet} dataset, on which the pretrained network is trained on, consists of 14 million images, in contrast to the several thousands we got here. \\
-The difference between the Color and Subclass accuracies can also be explained due to the difficulty of learning characteristics and nuances between different cars subclasses, unlike colors, which usually fill a significant part of the image.
+The network successfully classified the Color feature with 79.34\% (Large and Small Vehicles combined), the Subclass feature of Small Vehicles with 52.71\% and the Subclass feature of Large Vehicles with 45.28\%. The difference between the pretrained and fully trained networks is unsurprising, and can probably be explained due to the relatively small object instances fed to the network. The ImageNet \cite{imagenet} dataset, on which the pretrained network is trained on, consists of 14 million images, in contrast to the several thousands we got here. \\
+The difference between the Color and Subclass precisions can also be explained due to the difficulty of learning characteristics and nuances between different cars subclasses, unlike colors, which usually fill a significant part of the image.
 
 \section{Further Work}
-I did not have time to properly incorporate some $\approx$100 high resolution images to the training, as they did not fit into GPU memory. 
-The problem can be solved by cropping each image and using Non Maximum Suppression algorithm to omit duplicate predictions from the calculations, instead of scaling them down as I did.
-\\
+Regarding the $\approx$100 high resolution images which required a big downscaling, perhaps with more time I could implement a better solution:\\
+Perform cropping to smaller sizes, thus avoiding a big downscaling. We would need to take care of two problems:\\
+1. Splitted objects. To remediate this problem, for each two crops, we would take a third crop in-between, to cover splitted objects.\\
+2. Duplicate objects. This would be easily remediated using Non Maximum Suppression algorithm, which would remove the duplicated objects.
+\\\\
+More augmentations could have been made, either for all the classes and especially for the lower frequency ones.\\
+For the fine-grained classification, perhaps more basic augmentations would suffice: scaling, rotating, translating, lighting, etc.\\
+For the detection task in general that would be a bit more problematic since we have many objects per image and we need to take care about bounding boxes. A creative paper named Cut, Paste and Learn \cite{cutpastelearn}  suggests a unique way to generate more images using crops of our objects on realistic scenes. We could as well utilize here all the empty images we have in our dataset, as well as benefit of increased learning over small objects, as shown in the paper.
+\\\\
 I also did not have enough time to train the ResNet-50 network on all the fine grained features and calculate a cumulative score for the fine grained task which takes into account all the Cohen Kappas' scores of all the features, but only managed to proof the feasibility of this task by training on the Color and Subclass features.
 
 \begin{thebibliography}{9}
@@ -282,8 +287,12 @@ I also did not have enough time to train the ResNet-50 network on all the fine g
 	\\\texttt{https://pytorch.org/}
 	
 	\bibitem{jianweiyang} 
-	Jianwei Yang's F-RCNN PyTorch implementation
+	Jianwei Yang's F-RCNN PyTorch implementation.
 	\\\texttt{https://github.com/jwyang/faster-rcnn.pytorch}
+	
+	\bibitem{cutpastelearn} 
+	Debidatta Dwibedi, Ishan Misra, Martial Hebert. Cut, Paste and Learn: Surprisingly Easy Synthesis for Instance Detection.
+	\\\texttt{arXiv:1708.01642v1 [cs.CV]}
 	
 \end{thebibliography}
 
